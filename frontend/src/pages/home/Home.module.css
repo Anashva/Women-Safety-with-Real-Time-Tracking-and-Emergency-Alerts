@@ -1,0 +1,15 @@
+.hero {
+  height: 90vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("https://images.unsplash.com/photo-1526401485004-2fda9f2c4f1b")
+      no-repeat center center/cover;
+}
+.hero h2 {
+  font-size: 3rem;
+  text-align: center;
+}
+.hero p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
