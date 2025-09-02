@@ -1,6 +1,6 @@
 const mongoose=require("mongoose");
 const userSchema=new mongoose.Schema({
-name:{
+fullName:{
     type:String,
     trim:true,
     required:true
@@ -34,14 +34,23 @@ password:{
 },
 role: {
       type: String,
-      enum: ["user"], // ✅ only 2 roles allowed
+      enum: ["user"], //  only 2 roles allowed
       default: "user",
     },
 contacts: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Contact"
-    }
+        name: { type: String, required: true },
+        phone: {
+          type: String,
+          validate: {
+            validator: function (v) {
+              return /^\d{10}$/.test(v);
+            },
+            message: (props) =>`${props.value} is not a valid 10-digit phone number!`,
+          },
+          required: true,
+        },
+      }
   ]
 },{timestamps:true})
 

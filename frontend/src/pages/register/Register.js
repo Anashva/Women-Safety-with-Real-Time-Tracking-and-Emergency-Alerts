@@ -62,20 +62,13 @@ const Register = () => {
       alert(err.response?.data?.message || "Something went wrong");
     }
     } 
-  
 
+    
 
-
-
-
-
-
-
-
-  return (
+return (
  <div className="container mt-5">
       <h2 className="text-center mb-4">Register</h2>
-      <form className="mx-auto" style={{ maxWidth: "600px" }}>
+      <form className="mx-auto" style={{ maxWidth: "600px" }} onSubmit={handleRegiser}>
         {/* Full Name */}
         <div className="mb-3">
           <label className="form-label">Full Name</label>

@@ -26,10 +26,15 @@ const generateToken = (id) => {
 // Register User
 const registerUser = async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const { fullName, phone, email, password, contacts } = req.body;
+     // Validate required fields
+    if (!fullName || !email || !password) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
 
     // Check if user already exists
-    const userExists = await User.findOne({ name });
+    const userExists = await User.findOne({email});
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -40,13 +45,17 @@ const registerUser = async (req, res) => {
 
     // Create user
     const user = await User.create({
-      name,
+      fullName,
+      phone,
+      email,
       password: hashedPassword,
+      contacts,
     });
 
     res.status(201).json({
       _id: user._id,
-      name: user.name,
+      fullName: user.fullName,
+      email: user.email,
       token: generateToken(user._id),
     });
   } catch (error) {
@@ -75,7 +84,7 @@ const registerUser = async (req, res) => {
   try {
     const { name, password } = req.body;
 
-    const user = await User.findOne({ name });
+    const user = await User.findOne({ name});
 
     // user ko check krenge agr vo hai to token generate krenge
     if (user && (await bcrypt.compare(password, user.password))) {
