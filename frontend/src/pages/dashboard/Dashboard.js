@@ -1,15 +1,42 @@
-import React from 'react'
-import {Link} from 'react-router-dom'
+import React, { useEffect } from 'react'
+import {Link, useNavigate} from 'react-router-dom'
 import {Shield,MapPin,History} from 'lucide-react'
+import { useState }  from 'react';
+
 const Dashboard = () => {
+  const [user,setUser]=useState(null);
+  const navigate=useNavigate();
+
+  useEffect(()=>{
+    const token=localStorage.getItem("token");
+    if (!token) {
+      navigate("/login"); // redirect if no token
+      return;
+    }
+
+    fetch("http://localhost:8080/api/users/profile",{
+       headers: { Authorization: `Bearer ${token}` },
+    })
+    .then((res) => {
+        if (res.status === 401) {
+          navigate("/login"); // invalid token
+        }
+        return res.json();
+      })
+      .then((data) => setUser(data))
+      .catch(() => navigate("/login"));
+  }, [navigate]);
+
+
   return (
      <div className="dashboard-container">
       {/* Navbar */}
       <header className="navbar bg-dark text-white px-4 py-3 d-flex justify-content-between align-items-center">
         <h1 className="logo text-danger">SafeHer</h1>
         <nav>
-          <span className="me-3">Welcome, User 👋</span>
-          <Link to="/" className="btn btn-outline-light">
+          <span className="me-3">{user ? `Welcome, ${user.name} 👋` : "Loading..."}</span>
+          <Link to="/" className="btn btn-outline-light" onClick={() => {localStorage.removeItem("token"); // logout properly
+            navigate("/login");}}>
             Logout
           </Link>
         </nav>

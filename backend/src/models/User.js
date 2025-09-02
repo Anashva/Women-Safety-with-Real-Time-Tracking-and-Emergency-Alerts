@@ -44,5 +44,8 @@ contacts: [
     }
   ]
 },{timestamps:true})
+
+
+
 let user=mongoose.model('User',userSchema)
 module.exports=user
