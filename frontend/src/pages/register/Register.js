@@ -1,10 +1,16 @@
 import React from 'react'
-import { useState } from 'react'
-
+import { useState} from 'react'
+import axios from 'axios'
+import {useNavigate} from 'react-router-dom'
 
 
 
 const Register = () => {
+  const navigate=useNavigate();
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [contacts,setContacts]=useState([{name:"",phone:""}]);
 
   // add newly empty contact field
@@ -31,6 +37,41 @@ const Register = () => {
 
 
 
+
+  // handle karenge register submit ko
+  const handleRegiser=async (e)=>{
+    e.preventDefault();
+          try {
+      const res = await axios.post("http://localhost:8080/api/users/register", {
+        fullName,
+        phone,
+        email,
+        password,
+        contacts,
+      });
+
+      // token save karna
+      localStorage.setItem("token", res.data.token);
+
+      alert("Registration successful!");
+
+      // redirect dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Something went wrong");
+    }
+    } 
+  
+
+
+
+
+
+
+
+
+
   return (
  <div className="container mt-5">
       <h2 className="text-center mb-4">Register</h2>
@@ -41,7 +82,7 @@ const Register = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Enter your full name" required/>
+            placeholder="Enter your full name"  value={fullName} onChange={(e)=>setFullName(e.target.value)} required/>
         </div>
 
         {/* Phone Number */}
@@ -50,7 +91,7 @@ const Register = () => {
           <input
             type="tel"
             className="form-control"
-            placeholder="Enter your phone number" required/>
+            placeholder="Enter your phone number" value={phone} onChange={(e) => setPhone(e.target.value)} required/>
         </div>
 
         {/* Email */}
@@ -59,7 +100,7 @@ const Register = () => {
           <input
             type="email"
             className="form-control"
-            placeholder="Enter your email" required/>
+            placeholder="Enter your email" value={email} onChange={(e)=>setEmail(e.target.value)} required/>
         </div>
 
         {/* Password */}
@@ -68,7 +109,7 @@ const Register = () => {
           <input
             type="password"
             className="form-control"
-            placeholder="Enter password" required/>
+            placeholder="Enter password" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
         </div>
 
         {/* Emergency Contacts */}

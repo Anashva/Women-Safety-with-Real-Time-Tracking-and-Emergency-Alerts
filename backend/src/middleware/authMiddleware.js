@@ -1,28 +1,54 @@
-const jwt=require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 
 
+// Middleware to protect routes
+const authMiddleware=async (req, res, next) => {
+  let token;
 
-const authMiddleware=(req,res,next)=>{
-const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ msg: "No token provided" });
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = await User.findById(decoded.id).select("-password");
+
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Not authorized, token failed" });
+    }
   }
 
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded=jwt.verify(token,process.env.JWT_SECRET);
-    req.user=decoded.id;//it contains id of userid in request
-    next();
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
   }
-  catch(err){
-    return res.status(404).json({msg:"Invalid token"});
-  }
+};
 
 
 
-}
-
-export default authMiddleware;
+module.exports={ authMiddleware }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = { authMiddleware };
