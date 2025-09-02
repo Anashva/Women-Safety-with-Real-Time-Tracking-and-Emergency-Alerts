@@ -1,16 +1,12 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-// ✅ Utility: JWT generate
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
-
-// @desc   Register new user
-// @route  POST /api/users/register
-// @access Public
 const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
@@ -69,27 +65,9 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc   Logout user
-// @route  POST /api/users/logout
-// @access Private
-const logoutUser = async (req, res) => {
-  // frontend में बस localStorage/cookie clear करना होगा
-  res.json({ message: "Logged out successfully" });
-};
 
-// @desc   Get user profile
-// @route  GET /api/users/profile
-// @access Private
-const getProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).populate("contacts");
-    if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+
 
 // @desc   Update profile
 // @route  PUT /api/users/profile
@@ -133,37 +111,15 @@ const changePassword = async (req, res) => {
   }
 };
 
-// @desc   Delete account
-// @route  DELETE /api/users/delete
-// @access Private
-const deleteAccount = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.user.id);
-    res.json({ message: "Account deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
 
-// @desc   Get all users (Admin only)
-// @route  GET /api/users
-// @access Admin
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+
+
 
 module.exports = {
   registerUser,
   loginUser,
-  logoutUser,
-  getProfile,
+  
   updateProfile,
   changePassword,
-  deleteAccount,
-  getAllUsers,
+
 };

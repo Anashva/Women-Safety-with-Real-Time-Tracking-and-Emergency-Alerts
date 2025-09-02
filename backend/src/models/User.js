@@ -34,7 +34,7 @@ password:{
 },
 role: {
       type: String,
-      enum: ["user", "admin","police"], // ✅ only 2 roles allowed
+      enum: ["user"], // ✅ only 2 roles allowed
       default: "user",
     },
 contacts: [

@@ -19,18 +19,4 @@ const protect = async (req, res, next) => {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
 };
-
-const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
-    next();
-  } else {
-    return res.status(403).json({ message: "Access denied. Admins only." });
-  }
-};
-const policeOnly = (req, res, next) => {
-  if (req.user && req.user.role === "police") {
-    return next();
-  }
-  return res.status(403).json({ message: "Access denied. Police only." });
-};
-module.exports = { protect, adminOnly,policeOnly };
+module.exports = { protect };
