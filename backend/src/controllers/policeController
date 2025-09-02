@@ -1,0 +1,107 @@
+const PoliceStation = require("../models/Police");
+
+// @desc   Register new police station
+// @route  POST /api/police
+// @access Admin
+const addPoliceStation = async (req, res) => {
+  try {
+    const { name, coordinates, contact } = req.body;
+
+    const police = new PoliceStation({
+      name,
+      location: { type: "Point", coordinates },
+      contact,
+    });
+
+    await police.save();
+    res.status(201).json(police);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc   Get all police stations
+// @route  GET /api/police
+// @access Protected
+const getAllPoliceStations = async (req, res) => {
+  try {
+    const stations = await PoliceStation.find();
+    res.json(stations);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc   Get nearest police stations
+// @route  GET /api/police/nearby?lng=77.2&lat=28.6
+// @access Protected
+const getNearbyStations = async (req, res) => {
+  try {
+    const { lng, lat } = req.query;
+
+    if (!lng || !lat) {
+      return res.status(400).json({ message: "Please provide lng and lat" });
+    }
+
+    const stations = await PoliceStation.find({
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
+          $maxDistance: 5000, // 5 km radius
+        },
+      },
+    });
+
+    res.json(stations);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc   Update police station
+// @route  PUT /api/police/:id
+// @access Admin
+const updatePoliceStation = async (req, res) => {
+  try {
+    const police = await PoliceStation.findById(req.params.id);
+    if (!police) {
+      return res.status(404).json({ message: "Police station not found" });
+    }
+
+    police.name = req.body.name || police.name;
+    police.contact = req.body.contact || police.contact;
+    if (req.body.coordinates) {
+      police.location = { type: "Point", coordinates: req.body.coordinates };
+    }
+
+    const updatedPolice = await police.save();
+    res.json(updatedPolice);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc   Delete police station
+// @route  DELETE /api/police/:id
+// @access Admin
+const deletePoliceStation = async (req, res) => {
+  try {
+    const police = await PoliceStation.findById(req.params.id);
+    if (!police) {
+      return res.status(404).json({ message: "Police station not found" });
+    }
+
+    await police.deleteOne();
+    res.json({ message: "Police station deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  addPoliceStation,
+  getAllPoliceStations,
+  getNearbyStations,
+  updatePoliceStation,
+  deletePoliceStation,
+};
