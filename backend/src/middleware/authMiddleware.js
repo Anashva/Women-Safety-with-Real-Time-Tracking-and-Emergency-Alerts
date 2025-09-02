@@ -1,28 +1,36 @@
-const jwt=require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
+const protect = async (req, res, next) => {
+  let token;
 
-
-
-const authMiddleware=(req,res,next)=>{
-const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ msg: "No token provided" });
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select("-password");
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: "Not authorized, token failed" });
+    }
   }
 
-  const token = authHeader.split(" ")[1];
-  try {
-    const decoded=jwt.verify(token,process.env.JWT_SECRET);
-    req.user=decoded.id;//it contains id of userid in request
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
+};
+
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
     next();
+  } else {
+    return res.status(403).json({ message: "Access denied. Admins only." });
   }
-  catch(err){
-    return res.status(404).json({msg:"Invalid token"});
+};
+const policeOnly = (req, res, next) => {
+  if (req.user && req.user.role === "police") {
+    return next();
   }
-
-
-
-}
-
-export default authMiddleware;
-
-
+  return res.status(403).json({ message: "Access denied. Police only." });
+};
+module.exports = { protect, adminOnly,policeOnly };

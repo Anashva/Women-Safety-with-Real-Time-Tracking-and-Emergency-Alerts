@@ -3,9 +3,6 @@ const app=express();
 const mongoose=require('mongoose');
 const db=require('./src/config/db');
 const cors=require('cors');
-
-
-
 mongoose.connect('mongodb://127.0.0.1:27017/Women-Safety')
 .then(()=>{
     console.log("db connected")
@@ -21,16 +18,9 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 
-
-
-
-
-
 app.get('/',(req,res)=>{
     res.send("hello everyone 🙏")
 })
-
-
 
 
 
