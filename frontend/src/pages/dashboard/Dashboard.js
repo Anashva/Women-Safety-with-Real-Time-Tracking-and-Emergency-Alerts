@@ -32,13 +32,15 @@ const Dashboard = () => {
   }, [navigate]);
 
 
+
+
   return (
      <div className="dashboard-container">
       {/* Navbar */}
       <header className="navbar bg-dark text-white px-4 py-3 d-flex justify-content-between align-items-center">
         <h1 className="logo text-danger">SafeHer</h1>
         <nav>
-          <span className="me-3">{user ? `Welcome, ${user.name} 👋` : "Loading..."}</span>
+          <span className="me-3">{user ? `Welcome, ${user.fullName} 👋` : "Loading..."}</span>
           <Link to="/" className="btn btn-outline-light" onClick={() => {localStorage.removeItem("token"); // logout properly
             navigate("/login");}}>
             Logout
@@ -55,9 +57,6 @@ const Dashboard = () => {
           <p className="lead mt-3">
             Manage your alerts, track live locations, and check your alert history.
           </p>
-          <Link to="/alerts" className="btn btn-dark btn-lg mt-4">
-            🚨 View Alerts
-          </Link>
         </div>
       </section>
 
@@ -69,6 +68,8 @@ const Dashboard = () => {
               <Shield size={50} className="mb-3 text-danger" />
               <h3>SOS Alerts</h3>
               <p>Send instant SOS with your location.</p>
+               {/*  Emergency Button link */}
+               <Link to="/emergency" className="btn btn-danger mt-3">Emergency</Link>
             </div>
           </div>
 
@@ -85,6 +86,8 @@ const Dashboard = () => {
               <History size={50} className="mb-3 text-danger" />
               <h3>Alert History</h3>
               <p>Review past alerts anytime.</p>
+              {/* showing all history of alert */}
+              <Link to="/history" className="btn btn-danger mt-3">View History</Link>
             </div>
           </div>
         </div>
@@ -96,6 +99,8 @@ const Dashboard = () => {
       </footer>
     </div>
   )
+
 }
+
 
 export default Dashboard

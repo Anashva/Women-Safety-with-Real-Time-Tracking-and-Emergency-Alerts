@@ -5,9 +5,17 @@ const db=require('./src/config/db');
 const cors=require('cors');
 const userRoutes=require('./src/routes/userRoutes');
 const dotenv  = require('dotenv');
+const alertRoutes=require('./src/routes/alertRoutes')
+
+
+
+
+
 
 
 dotenv.config();
+
+
 
 
 
@@ -46,7 +54,7 @@ app.use(express.urlencoded({extended:true}))
 
 // routes
 app.use('/api/users',userRoutes);
-
+app.use('/api/alerts',alertRoutes);
 
 
 

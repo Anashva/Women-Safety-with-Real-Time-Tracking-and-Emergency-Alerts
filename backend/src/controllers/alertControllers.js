@@ -1,65 +1,64 @@
 const Alert = require("../models/Alert");
 
+
+
+
+// creating sos alert
 const createAlert = async (req, res) => {
   try {
-    const { latitude, longitude, userId } = req.body;
+    const { latitude, longitude, message } = req.body;
 
-    if (!latitude || !longitude) {
-      return res
-        .status(400)
-        .json({ message: "Location (lat, lng) is required" });
-    }
+    // Full user details from authMiddleware (req.user me already aa chuka hai)
+    const user = req.user;
 
-    const newAlert = new Alert({
-      userId: userId || null,
+    const alert = await Alert.create({
+      user: user._id,
       location: {
         type: "Point",
         coordinates: [longitude, latitude],
       },
-      status: "pending",
+      userSnapshot: {
+        fullName: user.fullName,
+        phone: user.phone,
+        email: user.email,
+      },
+      contactsSnapshot: user.contacts.map((c) => ({
+        name: c.name,
+        phone: c.phone,
+      })),
+      evidence: {
+        message: message || "SOS Triggered", // agar frontend se message bheja to
+      },
     });
 
-    await newAlert.save();
-
-    res.status(201).json({
-      message: "🚨 Alert created successfully",
-      alertId: newAlert._id,
-      alert: newAlert,
-    });
-  } catch (err) {
-    console.error("Error creating alert:", err);
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(201).json({ message: "SOS Alert created", alert });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
-const getAlerts = async (req, res) => {
+
+
+
+// sare alert honge jo jab user login hoga
+
+ const getMyAlerts = async (req, res) => {
   try {
-    const alerts = await Alert.find().populate(
-      "userId nearestPoliceId notifiedContacts"
-    );
+    const alerts = await Alert.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json(alerts);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching alerts", error: err.message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch alerts" });
   }
 };
 
-const updateAlertStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
 
-    const alert = await Alert.findByIdAndUpdate(id, { status }, { new: true });
 
-    if (!alert) return res.status(404).json({ message: "Alert not found" });
 
-    res.json({ message: "Status updated", alert });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error updating alert", error: err.message });
-  }
-};
 
-module.exports = { createAlert, getAlerts, updateAlertStatus };
+
+
+
+
+
+module.exports = { createAlert, getMyAlerts}

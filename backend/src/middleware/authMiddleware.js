@@ -51,4 +51,3 @@ module.exports={ authMiddleware }
 
 
 
-module.exports = { authMiddleware };
