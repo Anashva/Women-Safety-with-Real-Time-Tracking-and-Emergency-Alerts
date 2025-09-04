@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 const EmergencyButton = () => {
   const [loading, setLoading] = useState(false);
-
+const navigate = useNavigate(); 
   const sendSOS = () => {
     setLoading(true);
     const token = localStorage.getItem("token");
@@ -29,7 +31,9 @@ const EmergencyButton = () => {
 
           const data = await res.json();
           alert("🚨 SOS Sent Successfully!");
-          console.log(data);
+  navigate("/live-tracking"); 
+          // console.log(data);
+
         } catch (err) {
           console.error(err);
           alert("Failed to send SOS");

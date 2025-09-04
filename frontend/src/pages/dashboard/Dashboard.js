@@ -73,13 +73,20 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="col-md-4 mb-4">
+      <div
+            className="col-md-4 mb-4"
+            onClick={() => navigate("/live-tracking")}
+            style={{ cursor: "pointer" }}
+          >
             <div className="card shadow-sm p-4">
-              <MapPin size={50} className="mb-3 text-danger" />
-              <h3>Live Tracking</h3>
-              <p>Share your real-time location with friends and police.</p>
-            </div>
+            <MapPin size={50} className="mb-3 text-danger" />
+            <h3>Live Tracking</h3>
+            <p>Share your real-time location with friends and police.</p>
+            <Link to="/map-tracking" className="btn btn-danger mt-3">
+              Start Live Tracking
+            </Link>
           </div>
+</div>
 
           <div className="col-md-4 mb-4">
             <div className="card shadow-sm p-4">

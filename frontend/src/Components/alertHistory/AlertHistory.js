@@ -1,9 +1,10 @@
 import React from 'react'
 import { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 const AlertHistory = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
-
+const navigate = useNavigate(); 
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
@@ -32,6 +33,20 @@ const AlertHistory = () => {
 
   return (
     <div className="container mt-5">
+       <button
+        onClick={() => navigate("/dashboard")}
+        style={{
+          marginBottom: "10px",
+          padding: "8px 16px",
+          backgroundColor: "white",
+          color: "black",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        ← Back to Dashboard
+      </button>
       <h2 className="mb-4 text-center">📜 Alert History</h2>
       {alerts.length === 0 ? (
         <p className="text-center">No alerts found.</p>

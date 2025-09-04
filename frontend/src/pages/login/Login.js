@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:8080/api/users/login", {
-        username,
+       name: username,// yha change h name wle mein
         password,
       });
 

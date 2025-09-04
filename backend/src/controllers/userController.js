@@ -1,27 +1,12 @@
 const User=require('../models/User'); 
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken') 
-
-
-
-
-
 // JWT generate function
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
-
-
-
-
-
-
-
-
-
-
 
 // Register User
 const registerUser = async (req, res) => {
@@ -63,37 +48,23 @@ const registerUser = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Login User
  const loginUser = async (req, res) => {
   try {
-    const { name, password } = req.body;
+    const {name, password } = req.body; 
 
-    const user = await User.findOne({ name});
+    const user = await User.findOne({ fullName:name});// yha change h name wlw mein
 
     // user ko check krenge agr vo hai to token generate krenge
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         _id: user._id,
-        name: user.name,
+        fullName: user.fullName,
         token: generateToken(user._id),
       });
     } else {
+ 
+      
       res.status(401).json({ message: "Invalid username or password" });
     }
   } catch (error) {

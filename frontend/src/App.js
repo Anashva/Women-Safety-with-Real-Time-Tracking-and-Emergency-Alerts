@@ -6,9 +6,7 @@ import Register from './pages/register/Register'
 import Dashboard from './pages/dashboard/Dashboard';
 import EmergencyButton from './Components/emergencyButton/EmergencyButton';
 import AlertHistory from './Components/alertHistory/AlertHistory';
-
-
-
+import MapTracking from './Components/mapTracking/MapTracking';
 
 const App = () => {
   return (
@@ -20,6 +18,7 @@ const App = () => {
               <Route path='/dashboard' element={<Dashboard/>}/>
               <Route path='/emergency' element={<EmergencyButton/>}/>
               <Route path='/history' element={<AlertHistory/>}/>
+              <Route path="/live-tracking" element={<MapTracking />} />
             </Routes>
     </Fragment>
   )
