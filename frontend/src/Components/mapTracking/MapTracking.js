@@ -30,19 +30,12 @@ const navigate = useNavigate();
   return (
     <div>
        <button
-        onClick={() => navigate("/dashboard")}
-        style={{
-          marginBottom: "10px",
-          padding: "8px 16px",
-          backgroundColor: "white",
-          color: "black",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        ← Back to Dashboard
-      </button>
+  onClick={() => navigate("/dashboard")}
+  className="btn btn-danger mt-3"
+>
+  Back to Dashboard
+</button>
+
 
       <h2>📍 My Location</h2>
       <MapContainer

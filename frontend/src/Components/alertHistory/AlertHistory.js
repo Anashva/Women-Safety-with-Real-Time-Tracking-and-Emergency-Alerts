@@ -33,20 +33,14 @@ const navigate = useNavigate();
 
   return (
     <div className="container mt-5">
+      
        <button
-        onClick={() => navigate("/dashboard")}
-        style={{
-          marginBottom: "10px",
-          padding: "8px 16px",
-          backgroundColor: "white",
-          color: "black",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        ← Back to Dashboard
-      </button>
+  onClick={() => navigate("/dashboard")}
+  className="btn btn-danger mt-3"
+>
+  Back to Dashboard
+</button>
+      
       <h2 className="mb-4 text-center">📜 Alert History</h2>
       {alerts.length === 0 ? (
         <p className="text-center">No alerts found.</p>
@@ -64,9 +58,9 @@ const navigate = useNavigate();
             {alerts.map((alert, index) => (
               <tr key={alert._id}>
                 <td>{index + 1}</td>
-                <td>{alert.message}</td>
+                <td>{alert.evidence?.message || "No message"}</td>
                 <td>
-                  {alert.latitude}, {alert.longitude}
+                  {alert.location?.coordinates[1]}, {alert.location?.coordinates[0]}
                 </td>
                 <td>{new Date(alert.createdAt).toLocaleString()}</td>
               </tr>

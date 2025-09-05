@@ -61,7 +61,7 @@ const alertSchema = new mongoose.Schema(
     evidence: {
       photos: [String], // store image URLs or file paths
       voiceNotes: [String], // store voice note URLs
-      message: { type: String }, // optional text message
+      message: { type: String, required:true }, // optional text message
     },
   },
   { timestamps: true }
