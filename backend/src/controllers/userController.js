@@ -1,12 +1,19 @@
 const User=require('../models/User'); 
 const bcrypt=require('bcryptjs')
-const jwt=require('jsonwebtoken') 
+const jwt=require('jsonwebtoken')
+
+
+
+
 // JWT generate function
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
+
+
+
 
 // Register User
 const registerUser = async (req, res) => {
@@ -47,6 +54,10 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+
+
 
 // Login User
  const loginUser = async (req, res) => {

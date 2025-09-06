@@ -8,6 +8,10 @@ import EmergencyButton from './Components/emergencyButton/EmergencyButton';
 import AlertHistory from './Components/alertHistory/AlertHistory';
 import MapTracking from './Components/mapTracking/MapTracking';
 
+
+
+
+
 const App = () => {
   return (
     <Fragment>

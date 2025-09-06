@@ -1,7 +1,7 @@
 const express=require('express');
 const app=express();
 const mongoose=require('mongoose');
-const db=require('./src/config/db');
+// const db=require('./src/config/db');
 const cors=require('cors');
 const userRoutes=require('./src/routes/userRoutes');
 const dotenv  = require('dotenv');

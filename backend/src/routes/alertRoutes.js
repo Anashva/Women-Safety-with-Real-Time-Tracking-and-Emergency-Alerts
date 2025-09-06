@@ -8,6 +8,8 @@ const {authMiddleware}=require("../middleware/authMiddleware")
 router.post("/",authMiddleware,createAlert)
 
 
+
+
 // get all alerts
 router.get("/my",authMiddleware,getMyAlerts);
 

@@ -36,6 +36,7 @@ const createAlert = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// Advantage: Even if user updates profile later, the alert still keeps old snapshot.
 
 
 
@@ -44,7 +45,7 @@ const createAlert = async (req, res) => {
 
  const getMyAlerts = async (req, res) => {
   try {
-    const alerts = await Alert.find({ user: req.user.id }).sort({ createdAt: -1 });
+    const alerts = await Alert.find({ user: req.user.id }).sort({ createdAt: -1 });//newest alert sbse pehle aaega
     res.json(alerts);
   } catch (error) {
     console.error(error);

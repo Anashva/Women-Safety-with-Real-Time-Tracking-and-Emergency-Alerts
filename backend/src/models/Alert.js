@@ -4,7 +4,7 @@ const alertSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "User", //link with user schema
       required: true,
     },
 

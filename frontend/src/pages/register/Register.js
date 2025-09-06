@@ -26,7 +26,7 @@ const Register = () => {
   };
 
   const handleRegister = async (e) => {
-    e.preventDefault();
+    e.preventDefault();//page ko relaod hone se rokega 
     try {
       const res = await axios.post("http://localhost:8080/api/users/register", {
         fullName,
@@ -48,7 +48,7 @@ const Register = () => {
     <div
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
-        background: "linear-gradient(135deg, #fff5f5, #ffe6e6)", // 🔹 light pastel bg
+        background: "linear-gradient(135deg, #fff5f5, #ffe6e6)", // light pastel bg
       }}
     >
       <div className="card shadow-lg p-4 rounded-4" style={{ width: "450px" }}>
