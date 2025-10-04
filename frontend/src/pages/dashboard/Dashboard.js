@@ -83,9 +83,9 @@ const Dashboard = () => {
             <MapPin size={50} className="mb-3 text-danger" />
             <h3>Live Tracking</h3>
             <p>Share your real-time location with friends and police.</p>
-            {/* <Link to="/map-tracking" className="btn btn-danger mt-3">
+            <Link to="/map-tracking" className="btn btn-danger mt-3">
               Start Live Tracking
-            </Link> */}
+            </Link>
           </div>
 </div>
 
