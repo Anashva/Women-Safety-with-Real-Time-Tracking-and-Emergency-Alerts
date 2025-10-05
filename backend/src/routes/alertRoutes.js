@@ -1,6 +1,6 @@
 const express = require("express");
 const router=express.Router();
-const {createAlert,getMyAlerts}=require("../controllers/alertControllers")
+const {createAlert,getMyAlerts,acknowledgeAlert}=require("../controllers/alertControllers")
 const {authMiddleware}=require("../middleware/authMiddleware")
 const Alert=require('../models/Alert')
 
@@ -26,6 +26,9 @@ router.get("/all", async (req, res) => {
     res.status(500).json({ message: "Failed to fetch alerts" });
   }
 });
+
+//  route to acknowledge an alert
+router.post("/acknowledge/:id", authMiddleware, acknowledgeAlert);
 
 
 module.exports=router

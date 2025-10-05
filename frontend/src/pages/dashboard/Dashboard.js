@@ -2,6 +2,9 @@ import React, { useEffect } from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import {Shield,MapPin,History} from 'lucide-react'
 import { useState }  from 'react';
+import io from "socket.io-client";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const Dashboard = () => {
@@ -32,11 +35,29 @@ const Dashboard = () => {
       .catch(() => navigate("/login"));
   }, [navigate]);
 
+  useEffect(() => {
+  const userId = localStorage.getItem("userId"); // make sure you save this when user logs in
+  if (!userId) return;
 
+  const socket = io("http://localhost:8080");
+
+  // Join user's personal room
+  socket.emit("joinUser", userId);
+
+  // Listen for alert acknowledgment
+  socket.on("alertAcknowledged", (data) => {
+    toast.success(data.message, { position: "top-right" });
+  });
+
+  return () => {
+    socket.disconnect();
+  };
+}, []);
 
 
   return (
      <div className="dashboard-container">
+      <ToastContainer/>
       {/* Navbar */}
       <header className="navbar bg-dark text-white px-4 py-3 d-flex justify-content-between align-items-center">
         <h1 className="logo text-danger">SafeHer</h1>

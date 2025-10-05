@@ -45,7 +45,7 @@ const alertSchema = new mongoose.Schema(
     // Status of alert
     status: {
       type: String,
-      enum: ["pending", "active", "resolved"],
+      enum: ["pending", "in-progress", "resolved"],
       default: "pending",
     },
 
@@ -63,6 +63,7 @@ const alertSchema = new mongoose.Schema(
       voiceNotes: [String], // store voice note URLs
       message: { type: String, required:true }, // optional text message
     },
+    acknowledged: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

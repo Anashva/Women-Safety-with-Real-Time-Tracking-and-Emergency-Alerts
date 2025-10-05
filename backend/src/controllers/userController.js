@@ -69,8 +69,13 @@ const registerUser = async (req, res) => {
     // user ko check krenge agr vo hai to token generate krenge
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
-        _id: user._id,
-        fullName: user.fullName,
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          contacts: user.contacts,
+        },
         token: generateToken(user._id),
       });
     } else {

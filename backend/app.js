@@ -28,6 +28,13 @@ io.on("connection", (socket) => {
     console.log(`Police ${stationId} joined`);
   });
 
+  // ser joins their own room
+  socket.on("joinUser", (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined`);
+  });
+
+
   socket.on("disconnect", () => {
     console.log("Police disconnected");
   });

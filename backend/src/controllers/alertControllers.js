@@ -1,6 +1,6 @@
 const Alert = require("../models/Alert");
 const PoliceStation=require('../models/PoliceStation');
-
+const User = require("../models/User");
 
 
 
@@ -8,7 +8,7 @@ const PoliceStation=require('../models/PoliceStation');
 const createAlert = async (req, res) => {
   try {
     const { latitude, longitude, message } = req.body;
-    const user = req.user;
+    const user = await User.findById(req.user._id).select("fullName phone email contacts");;
 
     // Find nearest online police
     const nearestPolice = await PoliceStation.findOne({
@@ -23,6 +23,10 @@ const createAlert = async (req, res) => {
         }
       }
     });
+
+    if (!nearestPolice) {
+      nearestPolice = await PoliceStation.findOne({ status: "online" });
+    }
 
     // Create alert
     const alert = await Alert.create({
@@ -83,10 +87,31 @@ const createAlert = async (req, res) => {
 
 
 
+//  Acknowledge alert
+const acknowledgeAlert = async (req, res) => {
+  try {
+    const alert = await Alert.findById(req.params.id);
+    if (!alert) return res.status(404).json({ message: "Alert not found" });
+
+    alert.acknowledged = true;
+    alert.status = "resolved";
+    await alert.save();
+
+    // ✅ Emit socket event to the specific user who created the alert
+    const io = req.app.get("io");
+    if (io && alert.user) {
+      io.to(alert.user.toString()).emit("alertAcknowledged", {
+        message: "✅ Your SOS alert has been acknowledged by police",
+        alert,
+      });
+    }
+
+    res.json({ success: true, alert });
+  } catch (error) {
+    console.error("Acknowledge error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
-
-
-
-
-module.exports = { createAlert, getMyAlerts}
+module.exports = { createAlert, getMyAlerts,acknowledgeAlert}
