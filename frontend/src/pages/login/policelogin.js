@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const PoliceLogin = () => {
-  const [badgeId, setBadgeId] = useState(""); // police login with Badge/ID
+  const [username, setUsername] = useState(""); // changed from badgeId to username
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -12,12 +12,14 @@ const PoliceLogin = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:8080/api/police/login", {
-        badgeId, // police login with badge/ID
+        username, // send username instead of badgeId
         password,
       });
 
       localStorage.setItem("policeToken", res.data.token);
-      navigate("/police-dashboard");
+      localStorage.setItem("policeStationId", res.data.station._id);
+
+      navigate("/police/dashboard");
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Login failed");
@@ -28,7 +30,7 @@ const PoliceLogin = () => {
     <div
       className="d-flex justify-content-center align-items-center vh-100"
       style={{
-        background: "linear-gradient(135deg, #f8d7da, #ffe5e9)", // same soft pink bg
+        background: "linear-gradient(135deg, #f8d7da, #ffe5e9)",
       }}
     >
       <div
@@ -42,15 +44,15 @@ const PoliceLogin = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* Badge/ID */}
+          {/* Username */}
           <div className="mb-3">
-            <label className="form-label fw-semibold">Badge / ID</label>
+            <label className="form-label fw-semibold">Username</label>
             <input
               type="text"
               className="form-control"
-              placeholder="Enter Badge ID"
-              value={badgeId}
-              onChange={(e) => setBadgeId(e.target.value)}
+              placeholder="Enter Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               style={{ borderRadius: "10px" }}
             />

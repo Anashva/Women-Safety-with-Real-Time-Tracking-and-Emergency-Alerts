@@ -46,13 +46,13 @@ const alertSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "active", "resolved"],
-      default: "active",
+      default: "pending",
     },
 
     // Optional: Nearest police reference (if you are mapping police stations in DB)
     nearestPoliceId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Police",
+      ref: "PoliceStation",
     },
 
 
