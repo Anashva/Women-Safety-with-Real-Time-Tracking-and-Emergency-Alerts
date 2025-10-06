@@ -53,6 +53,7 @@ const createAlert = async (req, res) => {
     const io = req.app.get("io"); // Access Socket.io instance from app
     if (io) {
       io.to("onlinePolice").emit("newAlert", alert);
+      io.to(user._id.toString()).emit("newUserAlert", alert);
     }
 
 
