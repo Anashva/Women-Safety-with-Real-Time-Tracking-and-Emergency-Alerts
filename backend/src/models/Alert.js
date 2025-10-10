@@ -45,14 +45,14 @@ const alertSchema = new mongoose.Schema(
     // Status of alert
     status: {
       type: String,
-      enum: ["pending", "active", "resolved"],
-      default: "active",
+      enum: ["pending", "in-progress", "resolved"],
+      default: "pending",
     },
 
     // Optional: Nearest police reference (if you are mapping police stations in DB)
     nearestPoliceId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Police",
+      ref: "PoliceStation",
     },
 
 
@@ -63,6 +63,7 @@ const alertSchema = new mongoose.Schema(
       voiceNotes: [String], // store voice note URLs
       message: { type: String, required:true }, // optional text message
     },
+    acknowledged: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

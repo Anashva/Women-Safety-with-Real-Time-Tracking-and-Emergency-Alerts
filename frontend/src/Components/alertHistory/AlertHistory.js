@@ -66,7 +66,7 @@ const AlertHistory = () => {
                 <td>{index + 1}</td>
                 <td>{alert.evidence?.message || "No message"}</td>
                 <td>
-  {/* {alert.location?.coordinates ? (
+  {alert.location?.coordinates ? (
     <Link
       to={`https://www.google.com/maps?q=${alert.location.coordinates[1]},${alert.location.coordinates[0]}`}
       target="_blank"
@@ -76,7 +76,7 @@ const AlertHistory = () => {
     </Link>
   ) : (
     "N/A"
-  )} */}
+  )}
 </td>
 <td>
   <span

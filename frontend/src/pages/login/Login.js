@@ -19,6 +19,7 @@ const Login = () => {
         password,
       });
 
+      localStorage.setItem("userId", res.data.user._id)
       localStorage.setItem("token", res.data.token);
 
       navigate("/dashboard");
