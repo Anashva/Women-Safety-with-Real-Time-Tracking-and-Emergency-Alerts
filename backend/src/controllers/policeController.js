@@ -29,7 +29,10 @@ const registerPolice = async (req, res) => {
     });
 
     await newPolice.save();
-    res.status(201).json({ message: "Police station registered successfully!" });
+res.status(201).json({
+  message: "Police station registered successfully!",
+  station: newPolice, // frontend ko required data milega
+});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -52,7 +55,7 @@ const loginPolice = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: station._id }, "secretKey", { expiresIn: "7d" });
+    const token = jwt.sign({ id: station._id },  process.env.JWT_SECRET, { expiresIn: "7d" });
 
     // update status on login
     station.status = "online";

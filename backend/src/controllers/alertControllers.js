@@ -11,7 +11,7 @@ const createAlert = async (req, res) => {
     const user = await User.findById(req.user._id).select("fullName phone email contacts");;
 
     // Find nearest online police
-    const nearestPolice = await PoliceStation.findOne({
+    let nearestPolice = await PoliceStation.findOne({
       status: "online",
       location: {
         $near: {
