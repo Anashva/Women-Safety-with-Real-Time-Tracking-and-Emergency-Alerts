@@ -8,6 +8,7 @@ import EmergencyButton from './Components/emergencyButton/EmergencyButton';
 import AlertHistory from './Components/alertHistory/AlertHistory';
 import MapTracking from './Components/mapTracking/MapTracking';
 
+
 import PoliceRegisterPage from "./pages/register/policeregister";
 import PoliceLoginPage from "./pages/login/policelogin";
 import PoliceDashboardPage from "./pages/dashboard/policedashboard";
@@ -32,5 +33,4 @@ const App = () => {
     </Fragment>
   )
 }
-
-export default App
+export default App;

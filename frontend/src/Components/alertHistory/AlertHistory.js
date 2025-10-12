@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import io from "socket.io-client";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AlertHistory = () => {
   const [alerts, setAlerts] = useState([]);
@@ -37,6 +39,29 @@ const AlertHistory = () => {
     };
     fetchAlerts();
   }, [navigate]);
+useEffect(() => {
+    const userId = localStorage.getItem("userId"); // Make sure you save this on login
+    if (!userId) return;
+
+    const socket = io("http://localhost:8080");
+
+    // Join the user room
+    socket.emit("joinUser", userId);
+
+    // Show toast notification when police acknowledges alert
+    socket.on("alertAcknowledged", (data) => {
+      toast.success(data.message, { position: "top-right" });
+    });
+
+    // Update alert status in real-time
+    socket.on("alertStatusUpdate", ({ alertId, status }) => {
+      setAlerts((prev) =>
+        prev.map((a) => (a._id === alertId ? { ...a, status } : a))
+      );
+    });
+
+    return () => socket.disconnect();
+  }, []);
 
   if (loading) return <p className="text-center mt-5">Loading alerts...</p>;
 

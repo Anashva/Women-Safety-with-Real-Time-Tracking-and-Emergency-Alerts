@@ -12,6 +12,7 @@ const Dashboard = () => {
   
 
   const [user,setUser]=useState(null);
+
   const navigate=useNavigate();
 
   // only authorized user can access the dashboard
@@ -48,6 +49,8 @@ const Dashboard = () => {
   socket.on("alertAcknowledged", (data) => {
     toast.success(data.message, { position: "top-right" });
   });
+ 
+
 
   return () => {
     socket.disconnect();

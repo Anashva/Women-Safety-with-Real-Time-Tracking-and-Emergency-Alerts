@@ -871,6 +871,7 @@ const PoliceDashboardPage = () => {
 
   useEffect(() => {
     // Fetch station info
+    
     axios
       .get("http://localhost:8080/api/police/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -904,10 +905,7 @@ const PoliceDashboardPage = () => {
       setAlerts((prev) => [alert, ...prev]);
       setNewAlertIds((prev) => [...prev, alert._id]);
       alertSound();
-      toast.error(`🚨 SOS from ${alert.userSnapshot.fullName}`, {
-        position: "top-right",
-        autoClose: 8000,
-      });
+     
       setTimeout(() => {
         setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
       }, 10000);
@@ -934,24 +932,42 @@ const PoliceDashboardPage = () => {
     setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const acknowledgeAlert = async (id) => {
-    setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
-    toast.success("✅ Alert acknowledged", { position: "bottom-right" });
+  // const acknowledgeAlert = async (id) => {
+  //   setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
+   
 
-    try {
-      const res = await axios.post(
-        `http://localhost:8080/api/alerts/acknowledge/${id}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const ackAlert = res.data.alert;
-      setAlerts((prev) => prev.filter((a) => a._id !== id));
-      setHandledAlerts((prev) => [ackAlert, ...prev]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //   try {
+  //     const res = await axios.post(
+  //       `http://localhost:8080/api/alerts/acknowledge/${id}`,
+  //       {},
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+  //     const ackAlert = res.data.alert;
+  //     setAlerts((prev) => prev.filter((a) => a._id !== id));
+  //     setHandledAlerts((prev) => [ackAlert, ...prev]);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+const acknowledgeAlert = async (id) => {
+  try {
+    await axios.post(
+      `http://localhost:8080/api/alerts/acknowledge/${id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
+    // alerts list ko update karo, sirf acknowledged flag change
+    setAlerts((prev) =>
+      prev.map((alert) =>
+        alert._id === id ? { ...alert, acknowledged: true } : alert
+      )
+    );
+     toast.success("Alert acknowledged!");
+  } catch (err) {
+    console.error(err);
+  }
+};
   return (
     <div className="container my-4">
       <ToastContainer />

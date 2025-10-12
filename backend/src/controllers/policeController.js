@@ -133,6 +133,39 @@ const getAssignedAlerts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// In your policeController.js (acknowledgeAlert)
+const acknowledgeAlert = async (req, res) => {
+  try {
+    const alert = await Alert.findById(req.params.id);
+    if (!alert) return res.status(404).json({ message: "Alert not found" });
+
+    alert.acknowledged = true;
+    alert.status = "resolved";
+    await alert.save();
+
+    const io = req.app.get("io");
+
+    if (io && alert.user) {
+      // 1️⃣ Notify the user with a toast
+      io.to(alert.user.toString()).emit("alertAcknowledged", {
+        message: "✅ Your SOS alert has been acknowledged by police",
+        alert,
+      });
+
+      // 2️⃣ Update the alert status in user table
+      io.to(alert.user.toString()).emit("alertStatusUpdate", {
+        alertId: alert._id,
+        status: alert.status,
+      });
+    }
+
+    res.json({ success: true, alert });
+  } catch (error) {
+    console.error("Acknowledge error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 // =========================
 // 🧩 Export All
@@ -143,5 +176,5 @@ module.exports = {
   autoLogin,
   heartbeat,
   getDashboardData,
-  getAssignedAlerts,
+  getAssignedAlerts, acknowledgeAlert
 };

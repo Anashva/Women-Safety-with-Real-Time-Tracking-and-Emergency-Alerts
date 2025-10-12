@@ -91,6 +91,7 @@ const createAlert = async (req, res) => {
 //  Acknowledge alert
 const acknowledgeAlert = async (req, res) => {
   try {
+    
     const alert = await Alert.findById(req.params.id);
     if (!alert) return res.status(404).json({ message: "Alert not found" });
 
@@ -102,8 +103,15 @@ const acknowledgeAlert = async (req, res) => {
     const io = req.app.get("io");
     if (io && alert.user) {
       io.to(alert.user.toString()).emit("alertAcknowledged", {
-        message: "✅ Your SOS alert has been acknowledged by police",
-        alert,
+        // message: "✅ Your SOS alert has been acknowledged by police",
+        // alert,
+        alertId: alert._id,
+  status: alert.status, // "resolved"
+      });
+        // 2️⃣ Update alert status in real-time
+      io.to(alert.user.toString()).emit("alertStatusUpdate", {
+        alertId: alert._id,
+        status: alert.status,
       });
     }
 
@@ -113,6 +121,7 @@ const acknowledgeAlert = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 module.exports = { createAlert, getMyAlerts,acknowledgeAlert}
