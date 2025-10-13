@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const PoliceRegisterPage = () => {
-  // const navigate = useNavigate();
+   const navigate = useNavigate();
   const [stationName, setStationName] = useState("");
   const [officerName, setOfficerName] = useState("");
   const [phone, setPhone] = useState("");
@@ -32,7 +32,7 @@ const PoliceRegisterPage = () => {
       localStorage.setItem("policeStationId", res.data.station._id);
 
       alert("✅ Police Station Registered Successfully!");
-      // navigate("/police/login"); // redirect to login
+       navigate("/police/dashboard"); // redirect to login
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Registration failed");
