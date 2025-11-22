@@ -24,7 +24,7 @@ const AlertHistory = () => {
         });
 
         if (res.status === 401) {
-          localStorage.removeItem("token"); // clear token if invalid
+          localStorage.removeItem("token"); 
           navigate("/login");
           return;
         }
@@ -40,20 +40,18 @@ const AlertHistory = () => {
     fetchAlerts();
   }, [navigate]);
 useEffect(() => {
-    const userId = localStorage.getItem("userId"); // Make sure you save this on login
+    const userId = localStorage.getItem("userId"); 
     if (!userId) return;
 
     const socket = io("http://localhost:8080");
 
-    // Join the user room
+   
     socket.emit("joinUser", userId);
 
-    // Show toast notification when police acknowledges alert
     socket.on("alertAcknowledged", (data) => {
       toast.success(data.message, { position: "top-right" });
     });
 
-    // Update alert status in real-time
     socket.on("alertStatusUpdate", ({ alertId, status }) => {
       setAlerts((prev) =>
         prev.map((a) => (a._id === alertId ? { ...a, status } : a))
@@ -119,19 +117,7 @@ useEffect(() => {
   </span>
 </td>
 
-                {/* <td>
-                  <span
-                    className={`badge ${
-                      alert.status === "resolved"
-                        ? "bg-success"
-                        : alert.status === "active"
-                        ? "bg-warning text-dark"
-                        : "bg-secondary"
-                    }`}
-                  >
-                    {alert.status || "unknown"}
-                  </span>
-                </td> */}
+                
                 <td>{new Date(alert.createdAt).toLocaleString()}</td>
               </tr>
             ))}

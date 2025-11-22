@@ -1,23 +1,18 @@
+
 const PoliceStation = require("../models/PoliceStation");
 const jwt = require("jsonwebtoken");
-const Alert=require('../models/Alert');
-const bcrypt=require('bcryptjs')
+const Alert = require("../models/Alert");
+const bcrypt = require("bcryptjs");
 
-
-// =========================
-// 🟢 Register a Police Station
-// =========================
 const registerPolice = async (req, res) => {
   try {
     const { name, username, password, location } = req.body;
 
-    // check if username already exists
     const existing = await PoliceStation.findOne({ username });
     if (existing) {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newPolice = new PoliceStation({
@@ -29,18 +24,18 @@ const registerPolice = async (req, res) => {
     });
 
     await newPolice.save();
-res.status(201).json({
-  message: "Police station registered successfully!",
-  station: newPolice, // frontend ko required data milega
-});
+    res.status(201).json({
+      message: "Police station registered successfully!",
+      station: newPolice,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// =========================
-// 🟠 Login Police
-// =========================
+// -------------------------------------------
+// LOGIN
+// -------------------------------------------
 const loginPolice = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -55,9 +50,10 @@ const loginPolice = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ id: station._id },  process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ id: station._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    // update status on login
     station.status = "online";
     station.lastHeartbeat = new Date();
     await station.save();
@@ -68,9 +64,9 @@ const loginPolice = async (req, res) => {
   }
 };
 
-// =========================
-// 🟣 Auto Login
-// =========================
+// -------------------------------------------
+// AUTO LOGIN (token now same as normal login)
+// -------------------------------------------
 const autoLogin = async (req, res) => {
   try {
     const { username } = req.body;
@@ -80,7 +76,11 @@ const autoLogin = async (req, res) => {
       return res.status(404).json({ message: "Station not found" });
     }
 
-    const token = jwt.sign({ id: station._id }, "secretKey", { expiresIn: "7d" });
+    // FIXED: using SAME SECRET to avoid multiple login conflict
+    const token = jwt.sign({ id: station._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
     station.autoToken = token;
     station.status = "online";
     station.lastHeartbeat = new Date();
@@ -92,9 +92,7 @@ const autoLogin = async (req, res) => {
   }
 };
 
-// =========================
-// 🔵 Heartbeat
-// =========================
+// -------------------------------------------
 const heartbeat = async (req, res) => {
   try {
     const stationId = req.user.id;
@@ -108,9 +106,7 @@ const heartbeat = async (req, res) => {
   }
 };
 
-// =========================
-// 🟡 Dashboard Data
-// =========================
+// -------------------------------------------
 const getDashboardData = async (req, res) => {
   try {
     const station = await PoliceStation.findById(req.user.id);
@@ -120,9 +116,7 @@ const getDashboardData = async (req, res) => {
   }
 };
 
-// =========================
-// 🔴 Get Assigned Alerts
-// =========================
+// -------------------------------------------
 const getAssignedAlerts = async (req, res) => {
   try {
     const alerts = await Alert.find({ nearestPoliceId: req.user.id })
@@ -133,26 +127,32 @@ const getAssignedAlerts = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// In your policeController.js (acknowledgeAlert)
+
+// -------------------------------------------
+// ACKNOWLEDGE ALERT (MAIN FIXED PART)
+// -------------------------------------------
 const acknowledgeAlert = async (req, res) => {
   try {
     const alert = await Alert.findById(req.params.id);
     if (!alert) return res.status(404).json({ message: "Alert not found" });
 
     alert.acknowledged = true;
+
+    // FIXED: Dashboard expects "handled"
     alert.status = "resolved";
+
+    alert.handledTime = new Date();  // <-- add proper timestamp
     await alert.save();
 
     const io = req.app.get("io");
 
+    // Prevent crash if no user
     if (io && alert.user) {
-      // 1️⃣ Notify the user with a toast
       io.to(alert.user.toString()).emit("alertAcknowledged", {
         message: "✅ Your SOS alert has been acknowledged by police",
         alert,
       });
 
-      // 2️⃣ Update the alert status in user table
       io.to(alert.user.toString()).emit("alertStatusUpdate", {
         alertId: alert._id,
         status: alert.status,
@@ -166,15 +166,12 @@ const acknowledgeAlert = async (req, res) => {
   }
 };
 
-
-// =========================
-// 🧩 Export All
-// =========================
 module.exports = {
   registerPolice,
   loginPolice,
   autoLogin,
   heartbeat,
   getDashboardData,
-  getAssignedAlerts, acknowledgeAlert
+  getAssignedAlerts,
+  acknowledgeAlert,
 };

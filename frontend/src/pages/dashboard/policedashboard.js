@@ -1,856 +1,9 @@
-// import React, { useState, useEffect, useRef } from "react";
-// import axios from "axios";
-// import io from "socket.io-client";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
 
-// const socket = io("http://localhost:8080");
-
-// const PoliceDashboardPage = () => {
-//   const [alerts, setAlerts] = useState([]); // active alerts
-//   const [handledAlerts, setHandledAlerts] = useState([]); // acknowledged alerts
-//   const [stationData, setStationData] = useState(null);
-//   const [showMap, setShowMap] = useState({});
-//   const [newAlertIds, setNewAlertIds] = useState([]);
-//   const alertRefs = useRef({});
-//   const [showHandledModal, setShowHandledModal] = useState(false);
-
-//   const token = localStorage.getItem("policeToken");
-
-//   const alertSound = () => {
-//     const audio = new Audio("/siren.mp3");
-//     audio.play().catch(() => console.log("Sound autoplay blocked"));
-//   };
-
-//   useEffect(() => {
-//     axios
-//       .get("http://localhost:8080/api/police/dashboard", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       })
-//       .then((res) => setStationData(res.data.station))
-//       .catch(console.error);
-
-//     fetch("http://localhost:8080/api/alerts/all")
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setAlerts(data.filter((a) => !a.acknowledged));
-//         setHandledAlerts(data.filter((a) => a.acknowledged));
-//       })
-//       .catch(console.error);
-
-//     const stationId = localStorage.getItem("policeStationId");
-//     if (stationId) socket.emit("joinPolice", stationId);
-
-//     socket.on("newAlert", (alert) => {
-//       setAlerts((prev) => [alert, ...prev]);
-//       setNewAlertIds((prev) => [...prev, alert._id]);
-//       alertSound();
-//       toast.error(`🚨 SOS from ${alert.userSnapshot.fullName}`, {
-//         position: "top-right",
-//         autoClose: 8000,
-//       });
-//       setTimeout(() => {
-//         setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
-//       }, 10000);
-//     });
-
-//     const heartbeatInterval = setInterval(() => {
-//       axios
-//         .post(
-//           "http://localhost:8080/api/police/heartbeat",
-//           {},
-//           { headers: { Authorization: `Bearer ${token}` } }
-//         )
-//         .catch(console.error);
-//     }, 30000);
-
-//     return () => {
-//       socket.disconnect();
-//       clearInterval(heartbeatInterval);
-//     };
-//   }, [token]);
-
-//   const toggleMap = (id) => {
-//     setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
-//   };
-
-//   const acknowledgeAlert = async (id) => {
-//     setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
-//     toast.success("✅ Alert acknowledged", { position: "bottom-right" });
-
-//     try {
-//       const res = await axios.post(
-//         `http://localhost:8080/api/alerts/acknowledge/${id}`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       const ackAlert = res.data.alert;
-
-//       setAlerts((prev) => prev.filter((a) => a._id !== id));
-//       setHandledAlerts((prev) => [ackAlert, ...prev]); // store handled alert
-//     } catch (err) {
-//       console.error("Error acknowledging alert:", err);
-//     }
-//   };
-
-//   return (
-//     <div className="container my-4">
-//       <ToastContainer />
-//       <div className="d-flex justify-content-between align-items-center mb-3">
-//         <h1 className="text-danger">👮 Police Dashboard</h1>
-//         <button
-//           className="btn btn-outline-danger"
-//           onClick={() => setShowHandledModal(true)}
-//         >
-//           📜 Handled Alerts ({handledAlerts.length})
-//         </button>
-//       </div>
-
-//       {stationData && (
-//         <div className="mb-4 p-3 border rounded bg-light shadow-sm">
-//           <p><b>Station:</b> {stationData.name}</p>
-//           <p><b>Status:</b> {stationData.status}</p>
-//           <p>
-//             <b>Location:</b>{" "}
-//             {stationData.location?.coordinates?.join(", ")}
-//           </p>
-//         </div>
-//       )}
-
-//       <h3 className="mb-3 text-danger">🚨 Active Alerts</h3>
-//       {alerts.length === 0 ? (
-//         <p className="text-muted">No active alerts yet.</p>
-//       ) : (
-//         <div className="row">
-//           {alerts.map((alert) => (
-//             <div
-//               key={alert._id}
-//               className={`col-md-6 mb-4 ${
-//                 newAlertIds.includes(alert._id) ? "blink-alert" : ""
-//               }`}
-//               ref={(el) => (alertRefs.current[alert._id] = el)}
-//             >
-//               <div
-//                 className={`card border-danger shadow-sm h-100 ${
-//                   newAlertIds.includes(alert._id) ? "border-4" : ""
-//                 }`}
-//               >
-//                 <div className="card-header bg-danger text-white fw-bold">
-//                   {alert.userSnapshot?.fullName || "Unknown User"}
-//                 </div>
-//                 <div className="card-body">
-//   <p><b>Message:</b> {alert.evidence?.message}</p>
-
-// {alert.userSnapshot && (
-//     <>
-//       <p><b>Phone:</b> {alert.userSnapshot.phone || "N/A"}</p>
-//       <p><b>Email:</b> {alert.userSnapshot.email || "N/A"}</p>
-
-//       {alert.contactsSnapshot?.length > 0 && (
-//         <>
-//           <p><b>Emergency Contacts:</b></p>
-//           <ul>
-//             {alert.contactsSnapshot.map((c, idx) => (
-//               <li key={idx}>
-//                 {c.name} — {c.phone}
-//               </li>
-//             ))}
-//           </ul>
-//         </>
-//       )}
-//     </>
-//   )}
-
-//   <p>
-//     <b>Location:</b>{" "}
-//     {alert.location?.coordinates
-//       ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}`
-//       : "Not available"}
-//   </p>
-//   <p><b>Time:</b> {new Date(alert.createdAt).toLocaleString()}</p>
-
-//   {alert.location?.coordinates && (
-//     <button
-//       className="btn btn-sm btn-outline-danger mb-2"
-//       onClick={() => toggleMap(alert._id)}
-//     >
-//       {showMap[alert._id] ? "Hide Map" : "View on Map"}
-//     </button>
-//   )}
-
-//   {showMap[alert._id] && alert.location?.coordinates && (
-//     <MapContainer
-//       center={[alert.location.coordinates[1], alert.location.coordinates[0]]}
-//       zoom={13}
-//       style={{ height: "200px", width: "100%" }}
-//     >
-//       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-//       <Marker
-//         position={[alert.location.coordinates[1], alert.location.coordinates[0]]}
-//       >
-//         <Popup>
-//           {alert.userSnapshot.fullName} <br />
-//           {alert.evidence.message}
-//         </Popup>
-//       </Marker>
-//     </MapContainer>
-//   )}
-
-//   <button
-//     className="btn btn-sm btn-success mt-2"
-//     onClick={() => acknowledgeAlert(alert._id)}
-//   >
-//     ✅ Acknowledge
-//   </button>
-// </div>
-
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Handled Alerts Modal */}
-//       <div
-//         className={`modal fade ${showHandledModal ? "show d-block" : ""}`}
-//         tabIndex="-1"
-//         role="dialog"
-//         style={{ backgroundColor: showHandledModal ? "rgba(0,0,0,0.5)" : "transparent" }}
-//       >
-//         <div className="modal-dialog modal-dialog-scrollable" role="document">
-//           <div className="modal-content">
-//             <div className="modal-header">
-//               <h5 className="modal-title">Handled Alerts</h5>
-//               <button
-//                 type="button"
-//                 className="close btn"
-//                 onClick={() => setShowHandledModal(false)}
-//               >
-//                 &times;
-//               </button>
-//             </div>
-//             <div className="modal-body">
-//               {handledAlerts.length === 0 ? (
-//                 <p>No handled alerts yet.</p>
-//               ) : (
-//                 <ul className="list-group">
-//                   {handledAlerts.map((a) => (
-//                     <li className="list-group-item" key={a._id}>
-//                       {a.userSnapshot?.fullName} - {a.evidence?.message} <br/>
-//                       <small className="text-muted">{new Date(a.createdAt).toLocaleString()}</small>
-//                     </li>
-//                   ))}
-//                 </ul>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <style>
-//         {`
-//           .blink-alert {
-//             animation: blink 1s step-start 0s infinite;
-//           }
-//           @keyframes blink {
-//             50% { border-color: #ff0000; box-shadow: 0 0 10px red; }
-//           }
-//         `}
-//       </style>
-//     </div>
-//   );
-// };
-
-// export default PoliceDashboardPage;
-
-
-
-
-
-
-// import React, { useState, useEffect, useRef } from "react";
-// import axios from "axios";
-// import io from "socket.io-client";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
-
-// const socket = io("http://localhost:8080");
-
-// const PoliceDashboardPage = () => {
-//   const [alerts, setAlerts] = useState([]);
-//   const [handledAlerts, setHandledAlerts] = useState([]);
-//   const [stationData, setStationData] = useState(null);
-//   const [showMap, setShowMap] = useState({});
-//   const [newAlertIds, setNewAlertIds] = useState([]);
-//   const alertRefs = useRef({});
-//   const [showHandledModal, setShowHandledModal] = useState(false);
-
-//   const token = localStorage.getItem("policeToken");
-
-//   const alertSound = () => {
-//     const audio = new Audio("/siren.mp3");
-//     audio.play().catch(() => console.log("Sound autoplay blocked"));
-//   };
-
-//   useEffect(() => {
-//     axios
-//       .get("http://localhost:8080/api/police/dashboard", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       })
-//       .then((res) => setStationData(res.data.station))
-//       .catch(console.error);
-
-//     fetch("http://localhost:8080/api/alerts/all")
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setAlerts(data.filter((a) => !a.acknowledged));
-//         setHandledAlerts(data.filter((a) => a.acknowledged));
-//       })
-//       .catch(console.error);
-
-//     const stationId = localStorage.getItem("policeStationId");
-//     if (stationId) socket.emit("joinPolice", stationId);
-
-//     socket.on("newAlert", (alert) => {
-//       setAlerts((prev) => [alert, ...prev]);
-//       setNewAlertIds((prev) => [...prev, alert._id]);
-//       alertSound();
-//       toast.error(`🚨 SOS from ${alert.userSnapshot.fullName}`, {
-//         position: "top-right",
-//         autoClose: 8000,
-//       });
-//       setTimeout(() => {
-//         setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
-//       }, 10000);
-//     });
-
-//     const heartbeatInterval = setInterval(() => {
-//       axios
-//         .post(
-//           "http://localhost:8080/api/police/heartbeat",
-//           {},
-//           { headers: { Authorization: `Bearer ${token}` } }
-//         )
-//         .catch(console.error);
-//     }, 30000);
-
-//     return () => {
-//       socket.disconnect();
-//       clearInterval(heartbeatInterval);
-//     };
-//   }, [token]);
-
-//   const toggleMap = (id) => {
-//     setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
-//   };
-
-//   const acknowledgeAlert = async (id) => {
-//     setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
-//     toast.success("✅ Alert acknowledged", { position: "bottom-right" });
-
-//     try {
-//       const res = await axios.post(
-//         `http://localhost:8080/api/alerts/acknowledge/${id}`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       const ackAlert = res.data.alert;
-
-//       setAlerts((prev) => prev.filter((a) => a._id !== id));
-//       setHandledAlerts((prev) => [ackAlert, ...prev]);
-//     } catch (err) {
-//       console.error("Error acknowledging alert:", err);
-//     }
-//   };
-
-//   return (
-//     <div className="container my-4">
-//   <ToastContainer />
-//   <div className="d-flex justify-content-between align-items-center mb-3">
-//     <h1 className="text-primary text-center w-100">👮 Police Dashboard</h1>
-//     <button
-//       className="btn btn-outline-success"
-//       onClick={() => setShowHandledModal(true)}
-//     >
-//       📜 Handled Alerts ({handledAlerts.length})
-//     </button>
-//   </div>
-
-//   {stationData && (
-//     <div className="mb-4 p-3 border rounded shadow-sm" style={{ backgroundColor: "#e9f5ff", borderColor: "#0d6efd" }}>
-//       <p><b>Station:</b> {stationData.name}</p>
-//       <p><b>Status:</b> <span style={{ color: stationData.status === "online" ? "#198754" : "#dc3545" }}>{stationData.status}</span></p>
-//       <p>
-//         <b>Location:</b>{" "}
-//         {stationData.location?.coordinates?.join(", ")}
-//       </p>
-//     </div>
-//   )}
-
-//   <h3 className="mb-3 text-danger">🚨 Active Alerts</h3>
-//   {alerts.length === 0 ? (
-//     <p className="text-muted">No active alerts yet.</p>
-//   ) : (
-//     <div className="row">
-//       {alerts.map((alert) => (
-//         <div
-//           key={alert._id}
-//           className={`col-md-6 mb-4 ${newAlertIds.includes(alert._id) ? "blink-alert" : ""}`}
-//           ref={(el) => (alertRefs.current[alert._id] = el)}
-//         >
-//           <div
-//             className={`card shadow-sm h-100 ${newAlertIds.includes(alert._id) ? "border-4" : ""}`}
-//             style={{
-//               borderColor: "#dc3545",
-//               backgroundColor: "#fff5f5"
-//             }}
-//           >
-//             <div className="card-header fw-bold" style={{ backgroundColor: "#b02a37", color: "#fff" }}>
-//               {alert.userSnapshot?.fullName || "Unknown User"}
-//             </div>
-//             <div className="card-body">
-//               <p><b>Message:</b> {alert.evidence?.message}</p>
-//               {alert.userSnapshot && (
-//                 <>
-//                   <p><b>Phone:</b> {alert.userSnapshot.phone || "N/A"}</p>
-//                   <p><b>Email:</b> {alert.userSnapshot.email || "N/A"}</p>
-
-//                   {alert.contactsSnapshot?.length > 0 && (
-//                     <>
-//                       <p><b>Emergency Contacts:</b></p>
-//                       <ul>
-//                         {alert.contactsSnapshot.map((c, idx) => (
-//                           <li key={idx}>
-//                             {c.name} — {c.phone}
-//                           </li>
-//                         ))}
-//                       </ul>
-//                     </>
-//                   )}
-//                 </>
-//               )}
-
-//               <p>
-//                 <b>Location:</b>{" "}
-//                 {alert.location?.coordinates
-//                   ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}`
-//                   : "Not available"}
-//               </p>
-//               <p><b>Time:</b> {new Date(alert.createdAt).toLocaleString()}</p>
-
-//               {alert.location?.coordinates && (
-//                 <button
-//                   className="btn btn-sm btn-outline-primary mb-2"
-//                   onClick={() => toggleMap(alert._id)}
-//                 >
-//                   {showMap[alert._id] ? "Hide Map" : "View on Map"}
-//                 </button>
-//               )}
-
-//               {showMap[alert._id] && alert.location?.coordinates && (
-//                 <MapContainer
-//                   center={[alert.location.coordinates[1], alert.location.coordinates[0]]}
-//                   zoom={13}
-//                   style={{ height: "200px", width: "100%" }}
-//                 >
-//                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-//                   <Marker
-//                     position={[alert.location.coordinates[1], alert.location.coordinates[0]]}
-//                   >
-//                     <Popup>
-//                       {alert.userSnapshot.fullName} <br />
-//                       {alert.evidence.message}
-//                     </Popup>
-//                   </Marker>
-//                 </MapContainer>
-//               )}
-
-//               <button
-//                 className="btn btn-sm btn-danger mt-2"
-//                 onClick={() => acknowledgeAlert(alert._id)}
-//               >
-//                 ✅ Acknowledge
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   )}
-
-//   {/* Handled Alerts Modal */}
-//   <div
-//     className={`modal fade ${showHandledModal ? "show d-block" : ""}`}
-//     tabIndex="-1"
-//     role="dialog"
-//     style={{ backgroundColor: showHandledModal ? "rgba(0,0,0,0.5)" : "transparent" }}
-//   >
-//     <div className="modal-dialog modal-dialog-scrollable" role="document">
-//       <div className="modal-content">
-//         <div className="modal-header" style={{ backgroundColor: "#198754", color: "#fff" }}>
-//           <h5 className="modal-title">Handled Alerts</h5>
-//           <button
-//             type="button"
-//             className="close btn"
-//             onClick={() => setShowHandledModal(false)}
-//             style={{ color: "#fff" }}
-//           >
-//             &times;
-//           </button>
-//         </div>
-//         <div className="modal-body">
-//           {handledAlerts.length === 0 ? (
-//             <p>No handled alerts yet.</p>
-//           ) : (
-//             <ul className="list-group">
-//               {handledAlerts.map((a) => (
-//                 <li className="list-group-item" key={a._id}>
-//                   {a.userSnapshot?.fullName} - {a.evidence?.message} <br/>
-//                   <small className="text-muted">{new Date(a.createdAt).toLocaleString()}</small>
-//                 </li>
-//               ))}
-//             </ul>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-
-//   <style>
-//     {`
-//       .blink-alert {
-//         animation: blink 1s step-start 0s infinite;
-//       }
-//       @keyframes blink {
-//         50% { border-color: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
-//       }
-//     `}
-//   </style>
-// </div>
-
-//   );
-// };
-
-// export default PoliceDashboardPage;
-// import React, { useState, useEffect } from "react";
-// import axios from "axios";
-// import io from "socket.io-client";
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
-// import "bootstrap/dist/css/bootstrap.min.css";
-
-
-
-// const PoliceDashboardPage = () => {
-//   const [alerts, setAlerts] = useState([]);
-//   const [handledAlerts, setHandledAlerts] = useState([]);
-//   const [stationData, setStationData] = useState(null);
-//   const [showMap, setShowMap] = useState({});
-//   const [newAlertIds, setNewAlertIds] = useState([]);
-//   const [showHandledModal, setShowHandledModal] = useState(false);
-
-//   const token = localStorage.getItem("policeToken");
-// const socket = io("http://localhost:8080", {
-//   auth: {
-//     token: token
-//   }
-// });
-//   const alertSound = () => {
-//     const audio = new Audio("/siren.mp3");
-//     audio.play().catch(() => {});
-//   };
-
-//   useEffect(() => {
-//     // Fetch station info
-//     axios
-//       .get("http://localhost:8080/api/police/dashboard", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       })
-//       .then((res) => setStationData(res.data.station))
-//       .catch(() => {});
-
-//     // Fetch all alerts
-//     axios
-//       .get("http://localhost:8080/api/alerts/all")
-//       .then((res) => {
-//         const data = res.data;
-//         setAlerts(data.filter((a) => !a.acknowledged));
-//         setHandledAlerts(data.filter((a) => a.acknowledged));
-//       })
-//       .catch(() => {});
-
-//     // Join police room
-//     const stationId = localStorage.getItem("policeStationId");
-//     if (stationId) socket.emit("joinPolice", stationId);
-
-//     // Listen for new alerts
-//     socket.on("newAlert", (alert) => {
-//       setAlerts((prev) => [alert, ...prev]);
-//       setNewAlertIds((prev) => [...prev, alert._id]);
-//       alertSound();
-//       toast.error(`🚨 SOS from ${alert.userSnapshot.fullName}`, {
-//         position: "top-right",
-//         autoClose: 8000,
-//       });
-//       setTimeout(() => {
-//         setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
-//       }, 10000);
-//     });
-
-//     // Heartbeat interval
-//     const heartbeatInterval = setInterval(() => {
-//       axios
-//         .post(
-//           "http://localhost:8080/api/police/heartbeat",
-//           {},
-//           { headers: { Authorization: `Bearer ${token}` } }
-//         )
-//         .catch(() => {});
-//     }, 30000);
-
-//     return () => {
-//       clearInterval(heartbeatInterval);
-//       socket.off("newAlert"); // remove listener on unmount
-//     };
-//   }, [token]);
-
-//   const toggleMap = (id) => {
-//     setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
-//   };
-
-//   const acknowledgeAlert = async (id) => {
-//     setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
-//     toast.success("✅ Alert acknowledged", { position: "bottom-right" });
-
-//     try {
-//       const res = await axios.post(
-//         `http://localhost:8080/api/alerts/acknowledge/${id}`,
-//         {},
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       const ackAlert = res.data.alert;
-//       setAlerts((prev) => prev.filter((a) => a._id !== id));
-//       setHandledAlerts((prev) => [ackAlert, ...prev]);
-//     } catch (err) {}
-//   };
-
-//   return (
-//     <div className="container my-4">
-//       <ToastContainer />
-//       <div className="d-flex justify-content-between align-items-center mb-3">
-//         <h1 className="text-primary text-center w-100">👮 Police Dashboard</h1>
-//         <button
-//           className="btn btn-outline-success"
-//           onClick={() => setShowHandledModal(true)}
-//         >
-//           📜 Handled Alerts ({handledAlerts.length})
-//         </button>
-//       </div>
-
-//       {stationData && (
-//         <div
-//           className="mb-4 p-3 border rounded shadow-sm"
-//           style={{ backgroundColor: "#e9f5ff", borderColor: "#0d6efd" }}
-//         >
-//           <p>
-//             <b>Station:</b> {stationData.name}
-//           </p>
-//           <p>
-//             <b>Status:</b>{" "}
-//             <span
-//               style={{
-//                 color: stationData.status === "online" ? "#198754" : "#dc3545",
-//               }}
-//             >
-//               {stationData.status}
-//             </span>
-//           </p>
-//           <p>
-//             <b>Location:</b>{" "}
-//             {stationData.location?.coordinates?.join(", ")}
-//           </p>
-//         </div>
-//       )}
-
-//       <h3 className="mb-3 text-danger">🚨 Active Alerts</h3>
-//       {alerts.length === 0 ? (
-//         <p className="text-muted">No active alerts yet.</p>
-//       ) : (
-//         <div className="row">
-//           {alerts.map((alert) => (
-//             <div
-//               key={alert._id}
-//               className={`col-md-6 mb-4 ${
-//                 newAlertIds.includes(alert._id) ? "blink-alert" : ""
-//               }`}
-//             >
-//               <div
-//                 className={`card shadow-sm h-100 ${
-//                   newAlertIds.includes(alert._id) ? "border-4" : ""
-//                 }`}
-//                 style={{ borderColor: "#dc3545", backgroundColor: "#fff5f5" }}
-//               >
-//                 <div
-//                   className="card-header fw-bold"
-//                   style={{ backgroundColor: "#b02a37", color: "#fff" }}
-//                 >
-//                   {alert.userSnapshot?.fullName || "Unknown User"}
-//                 </div>
-//                 <div className="card-body">
-//                   <p>
-//                     <b>Message:</b> {alert.evidence?.message}
-//                   </p>
-//                   {alert.userSnapshot && (
-//                     <>
-//                       <p>
-//                         <b>Phone:</b> {alert.userSnapshot.phone || "N/A"}
-//                       </p>
-//                       <p>
-//                         <b>Email:</b> {alert.userSnapshot.email || "N/A"}
-//                       </p>
-//                       {alert.contactsSnapshot?.length > 0 && (
-//                         <>
-//                           <p>
-//                             <b>Emergency Contacts:</b>
-//                           </p>
-//                           <ul>
-//                             {alert.contactsSnapshot.map((c, idx) => (
-//                               <li key={idx}>
-//                                 {c.name} — {c.phone}
-//                               </li>
-//                             ))}
-//                           </ul>
-//                         </>
-//                       )}
-//                     </>
-//                   )}
-//                   <p>
-//                     <b>Location:</b>{" "}
-//                     {alert.location?.coordinates
-//                       ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}`
-//                       : "Not available"}
-//                   </p>
-//                   <p>
-//                     <b>Time:</b> {new Date(alert.createdAt).toLocaleString()}
-//                   </p>
-//                   {alert.location?.coordinates && (
-//                     <button
-//                       className="btn btn-sm btn-outline-primary mb-2"
-//                       onClick={() => toggleMap(alert._id)}
-//                     >
-//                       {showMap[alert._id] ? "Hide Map" : "View on Map"}
-//                     </button>
-//                   )}
-//                   {showMap[alert._id] && alert.location?.coordinates && (
-//                     <MapContainer
-//                       center={[
-//                         alert.location.coordinates[1],
-//                         alert.location.coordinates[0],
-//                       ]}
-//                       zoom={13}
-//                       style={{ height: "200px", width: "100%" }}
-//                     >
-//                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-//                       <Marker
-//                         position={[
-//                           alert.location.coordinates[1],
-//                           alert.location.coordinates[0],
-//                         ]}
-//                       >
-//                         <Popup>
-//                           {alert.userSnapshot.fullName} <br />
-//                           {alert.evidence.message}
-//                         </Popup>
-//                       </Marker>
-//                     </MapContainer>
-//                   )}
-//                   <button
-//                     className="btn btn-sm btn-danger mt-2"
-//                     onClick={() => acknowledgeAlert(alert._id)}
-//                   >
-//                     ✅ Acknowledge
-//                   </button>
-//                 </div>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       )}
-
-//       {/* Handled Alerts Modal */}
-//       {showHandledModal && (
-//         <div
-//           className="modal d-block"
-//           tabIndex="-1"
-//           style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-//         >
-//           <div className="modal-dialog modal-dialog-scrollable">
-//             <div className="modal-content">
-//               <div
-//                 className="modal-header"
-//                 style={{ backgroundColor: "#198754", color: "#fff" }}
-//               >
-//                 <h5 className="modal-title">Handled Alerts</h5>
-//                 <button
-//                   type="button"
-//                   className="btn-close btn"
-//                   onClick={() => setShowHandledModal(false)}
-//                   style={{ color: "#fff" }}
-//                 >
-//                   &times;
-//                 </button>
-//               </div>
-//               <div className="modal-body">
-//                 {handledAlerts.length === 0 ? (
-//                   <p>No handled alerts yet.</p>
-//                 ) : (
-//                   <ul className="list-group">
-//                     {handledAlerts.map((a) => (
-//                       <li className="list-group-item" key={a._id}>
-//                         {a.userSnapshot?.fullName} - {a.evidence?.message} <br />
-//                         <small className="text-muted">
-//                           {new Date(a.createdAt).toLocaleString()}
-//                         </small>
-//                       </li>
-//                     ))}
-//                   </ul>
-//                 )}
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-
-//       <style>
-//         {`
-//           .blink-alert {
-//             animation: blink 1s step-start infinite;
-//           }
-//           @keyframes blink {
-//             50% { border-color: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
-//           }
-//         `}
-//       </style>
-//     </div>
-//   );
-// };
-
-// export default PoliceDashboardPage;
 import React, { useState, useEffect, useRef } from "react";
+import { ToastContainer } from "react-toastify";
 import axios from "axios";
 import io from "socket.io-client";
-import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const PoliceDashboardPage = () => {
@@ -862,174 +15,282 @@ const PoliceDashboardPage = () => {
   const [showHandledModal, setShowHandledModal] = useState(false);
 
   const socketRef = useRef(null);
-  const token = localStorage.getItem("policeToken");
+  const alertAudioRef = useRef(null);
+  const heartbeatRef = useRef(null);
 
-  const alertSound = () => {
-    const audio = new Audio("/siren.mp3");
-    audio.play().catch(() => {});
+  const token = localStorage.getItem("policeToken");
+  const rawStationId = localStorage.getItem("policeStationId");
+
+  // Robust normalize: accepts strings, JSON strings with $oid, objects, ObjectId-like
+  const normalizeId = (id) => {
+    if (!id && id !== 0) return "";
+    // if already object with fields
+    if (typeof id === "object") {
+      if (id._id) return id._id.toString();
+      if (id.$oid) return id.$oid.toString();
+      try {
+        return id.toString();
+      } catch {
+        return "";
+      }
+    }
+
+    // if string - try JSON parse for patterns like '{"$oid":"..."}'
+    if (typeof id === "string") {
+      const trimmed = id.trim();
+      if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || trimmed.includes('"$oid"')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (parsed && (parsed.$oid || parsed._id)) {
+            return (parsed.$oid || parsed._id).toString();
+          }
+        } catch {
+          // not JSON, fallthrough
+        }
+      }
+
+      // common case: raw ObjectId string
+      return trimmed;
+    }
+
+    // fallback
+    try {
+      return id.toString();
+    } catch {
+      return "";
+    }
+  };
+
+  // derive a single cleanId constant used everywhere
+  const cleanStationId = normalizeId(rawStationId);
+
+  // Initialize siren audio once
+  useEffect(() => {
+    alertAudioRef.current = new Audio("/siren.mp3");
+    alertAudioRef.current.loop = true;
+    return () => {
+      if (alertAudioRef.current) {
+        alertAudioRef.current.pause();
+        alertAudioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  // Play/pause siren when newAlertIds changes
+  useEffect(() => {
+    if (!alertAudioRef.current) return;
+    if (newAlertIds.length > 0) {
+      alertAudioRef.current.play().catch(() => {});
+    } else {
+      alertAudioRef.current.pause();
+      alertAudioRef.current.currentTime = 0;
+    }
+  }, [newAlertIds]);
+
+  // Fetch alerts and station info (uses cleanStationId)
+  const fetchAlerts = async () => {
+    if (!cleanStationId) {
+      console.warn("No stationId found in localStorage (policeStationId).");
+      return;
+    }
+
+    try {
+      // you used /api/alerts/all earlier — keep that and filter client-side
+      // alternatively if you have a police-specific route use that (recommended)
+      const res = await axios.get("http://localhost:8080/api/alerts/all", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = Array.isArray(res.data) ? res.data : res.data.alerts || res.data;
+
+      // show only alerts assigned to this station
+      const active = data.filter(
+        (alert) =>
+          normalizeId(alert.nearestPoliceId) === cleanStationId && !alert.acknowledged
+      );
+
+      const handled = data.filter(
+        (alert) => normalizeId(alert.nearestPoliceId) === cleanStationId && alert.acknowledged
+      );
+
+      setAlerts(active);
+      setHandledAlerts(handled);
+    } catch (err) {
+      console.error("fetchAlerts error", err);
+    }
   };
 
   useEffect(() => {
-    // Fetch station info
-    
+    if (!cleanStationId) {
+      console.error("PoliceStationId missing or invalid in localStorage:", rawStationId);
+      return;
+    }
+
+    // fetch station meta (name, status, location)
     axios
       .get("http://localhost:8080/api/police/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setStationData(res.data.station))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error("fetch stationData error", err));
 
-    // Fetch all alerts
-    axios
-      .get("http://localhost:8080/api/alerts/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        const data = res.data;
-        setAlerts(data.filter((a) => !a.acknowledged));
-        setHandledAlerts(data.filter((a) => a.acknowledged));
-      })
-      .catch((err) => console.error(err));
+    // initial alerts
+    fetchAlerts();
 
-    // Initialize socket connection once
-    socketRef.current = io("http://localhost:8080", {
-      auth: { token },
+    // initialize socket and join room
+    socketRef.current = io("http://localhost:8080", { transports: ["websocket", "polling"] });
+
+    socketRef.current.on("connect", () => {
+      console.log("Socket connected:", socketRef.current.id);
+      // join using normalized id
+      socketRef.current.emit("joinPolice", cleanStationId);
+      console.log("Joined police room:", cleanStationId);
     });
 
-    // Join police room
-    const stationId = localStorage.getItem("policeStationId");
-    if (stationId) socketRef.current.emit("joinPolice", stationId);
-
-    // Listen for new alerts
+    // LISTENERS (keeps UI in sync with backend)
     socketRef.current.on("newAlert", (alert) => {
-      setAlerts((prev) => [alert, ...prev]);
-      setNewAlertIds((prev) => [...prev, alert._id]);
-      alertSound();
-     
-      setTimeout(() => {
-        setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
-      }, 10000);
+      // only add if this alert is for this station (defensive)
+      if (normalizeId(alert.nearestPoliceId) === cleanStationId) {
+        setAlerts((prev) => [alert, ...prev]);
+        setNewAlertIds((prev) => [...prev, alert._id]);
+
+        setTimeout(() => {
+          setNewAlertIds((prev) => prev.filter((id) => id !== alert._id));
+        }, 10000);
+      }
     });
 
-    // Heartbeat interval
-    const heartbeatInterval = setInterval(() => {
+    // When backend removes alert from this (old) station's dashboard
+    socketRef.current.on("alertRemoved", ({ alertId }) => {
+      setAlerts((prev) => prev.filter((a) => a._id !== alertId));
+    });
+
+    // When alert is handled/resolved (acknowledged)
+    socketRef.current.on("alertHandled", (updatedAlert) => {
+      // remove from active and add to handled (if for this station)
+      if (normalizeId(updatedAlert.nearestPoliceId) === cleanStationId) {
+        setAlerts((prev) => prev.filter((a) => a._id !== updatedAlert._id));
+        setHandledAlerts((prev) => [updatedAlert, ...prev]);
+      } else {
+        // if assigned away from this station, remove it
+        setAlerts((prev) => prev.filter((a) => a._id !== updatedAlert._id));
+      }
+    });
+
+    // Optional: backend may emit this when it assigns an alert to a station
+    socketRef.current.on("alertAssigned", (assignedAlert) => {
+      if (normalizeId(assignedAlert.nearestPoliceId) === cleanStationId) {
+        setAlerts((prev) => [assignedAlert, ...prev]);
+      }
+    });
+
+    // fallback: when an alert is updated (e.g., re-assigned to this station),
+    socketRef.current.on("alert-updated", (updated) => {
+      // replace if exists, else add if relevant
+      if (normalizeId(updated.nearestPoliceId) === cleanStationId) {
+        setAlerts((prev) => {
+          const has = prev.find((a) => a._id === updated._id);
+          if (has) return prev.map((a) => (a._id === updated._id ? updated : a));
+          return [updated, ...prev];
+        });
+      } else {
+        // removed from this station
+        setAlerts((prev) => prev.filter((a) => a._id !== updated._id));
+      }
+    });
+
+    // HEARTBEAT (keep station online)
+    heartbeatRef.current = setInterval(() => {
       axios
-        .post(
-          "http://localhost:8080/api/police/heartbeat",
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
+        .post("http://localhost:8080/api/police/heartbeat", {}, { headers: { Authorization: `Bearer ${token}` } })
         .catch(() => {});
     }, 30000);
 
+    // cleanup
     return () => {
-      clearInterval(heartbeatInterval);
-      if (socketRef.current) socketRef.current.disconnect();
+      if (heartbeatRef.current) clearInterval(heartbeatRef.current);
+      if (socketRef.current) {
+        socketRef.current.off("newAlert");
+        socketRef.current.off("alertRemoved");
+        socketRef.current.off("alertHandled");
+        socketRef.current.off("alertAssigned");
+        socketRef.current.off("alert-updated");
+        socketRef.current.disconnect();
+      }
+      if (alertAudioRef.current) {
+        alertAudioRef.current.pause();
+        alertAudioRef.current.currentTime = 0;
+      }
     };
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cleanStationId, token]); // run when stationId or token changes
 
-  const toggleMap = (id) => {
-    setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleMap = (id) => setShowMap((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const acknowledgeAlert = async (id) => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/alerts/acknowledge/${id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const updated = res.data.alert;
+
+      // remove from active
+      setAlerts((prev) => prev.filter((a) => a._id !== id));
+
+      // add to handled if returned
+      if (updated) setHandledAlerts((prev) => [updated, ...prev]);
+    } catch (err) {
+      console.error("acknowledge error", err);
+    }
   };
 
-  // const acknowledgeAlert = async (id) => {
-  //   setNewAlertIds((prev) => prev.filter((alertId) => alertId !== id));
-   
-
-  //   try {
-  //     const res = await axios.post(
-  //       `http://localhost:8080/api/alerts/acknowledge/${id}`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-  //     const ackAlert = res.data.alert;
-  //     setAlerts((prev) => prev.filter((a) => a._id !== id));
-  //     setHandledAlerts((prev) => [ackAlert, ...prev]);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-const acknowledgeAlert = async (id) => {
-  try {
-    await axios.post(
-      `http://localhost:8080/api/alerts/acknowledge/${id}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    // alerts list ko update karo, sirf acknowledged flag change
-    setAlerts((prev) =>
-      prev.map((alert) =>
-        alert._id === id ? { ...alert, acknowledged: true } : alert
-      )
-    );
-     toast.success("Alert acknowledged!");
-  } catch (err) {
-    console.error(err);
-  }
-};
   return (
     <div className="container my-4">
       <ToastContainer />
+
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h1 className="text-primary text-center w-100">👮 Police Dashboard</h1>
-        <button
-          className="btn btn-outline-success"
-          onClick={() => setShowHandledModal(true)}
-        >
+        <button className="btn btn-outline-success" onClick={() => setShowHandledModal(true)}>
           📜 Handled Alerts ({handledAlerts.length})
         </button>
       </div>
 
       {stationData && (
-        <div
-          className="mb-4 p-3 border rounded shadow-sm"
-          style={{ backgroundColor: "#e9f5ff", borderColor: "#0d6efd" }}
-        >
+        <div className="mb-4 p-3 border rounded shadow-sm" style={{ backgroundColor: "#e9f5ff", borderColor: "#0d6efd" }}>
           <p>
             <b>Station:</b> {stationData.name}
           </p>
           <p>
             <b>Status:</b>{" "}
-            <span
-              style={{
-                color: stationData.status === "online" ? "#198754" : "#dc3545",
-              }}
-            >
+            <span style={{ color: stationData.status === "online" ? "#198754" : "#dc3545" }}>
               {stationData.status}
             </span>
           </p>
           <p>
-            <b>Location:</b>{" "}
-            {stationData.location?.coordinates?.join(", ")}
+            <b>Location:</b> {stationData.location?.coordinates?.join(", ")}
+          </p>
+          <p>
+            {/* <b>Station ID:</b> <small className="text-muted">{cleanStationId}</small> */}
           </p>
         </div>
       )}
 
       <h3 className="mb-3 text-danger">🚨 Active Alerts</h3>
+
       {alerts.length === 0 ? (
-        <p className="text-muted">No active alerts yet.</p>
+        <p className="text-muted">No active alerts.</p>
       ) : (
         <div className="row">
           {alerts.map((alert) => (
-            <div
-              key={alert._id}
-              className={`col-md-6 mb-4 ${
-                newAlertIds.includes(alert._id) ? "blink-alert" : ""
-              }`}
-            >
-              <div
-                className={`card shadow-sm h-100 ${
-                  newAlertIds.includes(alert._id) ? "border-4" : ""
-                }`}
-                style={{ borderColor: "#dc3545", backgroundColor: "#fff5f5" }}
-              >
-                <div
-                  className="card-header fw-bold"
-                  style={{ backgroundColor: "#b02a37", color: "#fff" }}
-                >
+            <div key={alert._id} className={`col-md-6 mb-4 ${newAlertIds.includes(alert._id) ? "blink-alert" : ""}`}>
+              <div className="card shadow-sm h-100" style={{ borderColor: "#dc3545", backgroundColor: "#fff5f5" }}>
+                <div className="card-header fw-bold" style={{ backgroundColor: "#b02a37", color: "#fff" }}>
                   {alert.userSnapshot?.fullName || "Unknown User"}
                 </div>
+
                 <div className="card-body">
                   <p>
                     <b>Message:</b> {alert.evidence?.message}
@@ -1042,66 +303,34 @@ const acknowledgeAlert = async (id) => {
                       <p>
                         <b>Email:</b> {alert.userSnapshot.email || "N/A"}
                       </p>
-                      {alert.contactsSnapshot?.length > 0 && (
-                        <>
-                          <p>
-                            <b>Emergency Contacts:</b>
-                          </p>
-                          <ul>
-                            {alert.contactsSnapshot.map((c, idx) => (
-                              <li key={idx}>
-                                {c.name} — {c.phone}
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )}
                     </>
                   )}
-                  <p>
-                    <b>Location:</b>{" "}
-                    {alert.location?.coordinates
-                      ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}`
-                      : "Not available"}
-                  </p>
+
                   <p>
                     <b>Time:</b> {new Date(alert.createdAt).toLocaleString()}
                   </p>
+
                   {alert.location?.coordinates && (
-                    <button
-                      className="btn btn-sm btn-outline-primary mb-2"
-                      onClick={() => toggleMap(alert._id)}
-                    >
-                      {showMap[alert._id] ? "Hide Map" : "View on Map"}
-                    </button>
+                    <>
+                      <button className="btn btn-sm btn-outline-primary mb-2" onClick={() => toggleMap(alert._id)}>
+                        {showMap[alert._id] ? "Hide Map" : "View on Map"}
+                      </button>
+
+                      {showMap[alert._id] && (
+                        <iframe
+                          title={`map-${alert._id}`}
+                          width="100%"
+                          height="250"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          allowFullScreen
+                          src={`https://www.google.com/maps?q=${alert.location.coordinates[1]},${alert.location.coordinates[0]}&z=15&output=embed`}
+                        ></iframe>
+                      )}
+                    </>
                   )}
-                  {showMap[alert._id] && alert.location?.coordinates && (
-                    <MapContainer
-                      center={[
-                        alert.location.coordinates[1],
-                        alert.location.coordinates[0],
-                      ]}
-                      zoom={13}
-                      style={{ height: "200px", width: "100%" }}
-                    >
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                      <Marker
-                        position={[
-                          alert.location.coordinates[1],
-                          alert.location.coordinates[0],
-                        ]}
-                      >
-                        <Popup>
-                          {alert.userSnapshot.fullName} <br />
-                          {alert.evidence.message}
-                        </Popup>
-                      </Marker>
-                    </MapContainer>
-                  )}
-                  <button
-                    className="btn btn-sm btn-danger mt-2"
-                    onClick={() => acknowledgeAlert(alert._id)}
-                  >
+
+                  <button className="btn btn-sm btn-danger mt-2" onClick={() => acknowledgeAlert(alert._id)}>
                     ✅ Acknowledge
                   </button>
                 </div>
@@ -1111,29 +340,17 @@ const acknowledgeAlert = async (id) => {
         </div>
       )}
 
-      {/* Handled Alerts Modal */}
       {showHandledModal && (
-        <div
-          className="modal d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-        >
+        <div className="modal d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
           <div className="modal-dialog modal-dialog-scrollable">
             <div className="modal-content">
-              <div
-                className="modal-header"
-                style={{ backgroundColor: "#198754", color: "#fff" }}
-              >
+              <div className="modal-header" style={{ backgroundColor: "#198754", color: "#fff" }}>
                 <h5 className="modal-title">Handled Alerts</h5>
-                <button
-                  type="button"
-                  className="btn-close btn"
-                  onClick={() => setShowHandledModal(false)}
-                  style={{ color: "#fff" }}
-                >
+                <button type="button" className="btn-close btn" onClick={() => setShowHandledModal(false)} style={{ color: "#fff" }}>
                   &times;
                 </button>
               </div>
+
               <div className="modal-body">
                 {handledAlerts.length === 0 ? (
                   <p>No handled alerts yet.</p>
@@ -1141,10 +358,9 @@ const acknowledgeAlert = async (id) => {
                   <ul className="list-group">
                     {handledAlerts.map((a) => (
                       <li className="list-group-item" key={a._id}>
-                        {a.userSnapshot?.fullName} - {a.evidence?.message} <br />
-                        <small className="text-muted">
-                          {new Date(a.createdAt).toLocaleString()}
-                        </small>
+                        {a.userSnapshot?.fullName} - {a.evidence?.message}
+                        <br />
+                        <small className="text-muted">{new Date(a.createdAt).toLocaleString()}</small>
                       </li>
                     ))}
                   </ul>
@@ -1155,16 +371,14 @@ const acknowledgeAlert = async (id) => {
         </div>
       )}
 
-      <style>
-        {`
-          .blink-alert {
-            animation: blink 1s step-start infinite;
-          }
-          @keyframes blink {
-            50% { border-color: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
-          }
-        `}
-      </style>
+      <style>{`
+        .blink-alert {
+          animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+          50% { border-color: #ff6b6b; box-shadow: 0 0 10px #ff6b6b; }
+        }
+      `}</style>
     </div>
   );
 };

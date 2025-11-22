@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-
 const Register = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
@@ -9,22 +8,18 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [contacts, setContacts] = useState([{ name: "", phone: "" }]);
-
   const addContact = () => {
     setContacts([...contacts, { name: "", phone: "" }]);
   };
-
   const handleContactChange = (index, field, value) => {
     const updatedContacts = [...contacts];
     updatedContacts[index][field] = value;
     setContacts(updatedContacts);
   };
-
   const removeContact = (index) => {
     const updatedContacts = contacts.filter((_, i) => i !== index);
     setContacts(updatedContacts);
   };
-
   const handleRegister = async (e) => {
     e.preventDefault();//page ko relaod hone se rokega 
     try {

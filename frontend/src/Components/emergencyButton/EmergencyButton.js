@@ -32,7 +32,7 @@ const navigate = useNavigate();
           const data = await res.json();
           alert("🚨 SOS Sent Successfully!");
  navigate("/live-tracking"); 
-          // console.log(data);
+         
 
         } catch (err) {
           console.error(err);

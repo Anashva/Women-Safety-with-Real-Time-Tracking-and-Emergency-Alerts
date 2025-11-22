@@ -32,7 +32,7 @@ const PoliceRegisterPage = () => {
       localStorage.setItem("policeStationId", res.data.station._id);
 
       alert("✅ Police Station Registered Successfully!");
-       navigate("/police/dashboard"); // redirect to login
+       navigate("/police/login"); // redirect to login
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Registration failed");

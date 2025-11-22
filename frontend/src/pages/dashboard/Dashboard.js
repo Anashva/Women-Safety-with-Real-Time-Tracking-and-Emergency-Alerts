@@ -15,11 +15,11 @@ const Dashboard = () => {
 
   const navigate=useNavigate();
 
-  // only authorized user can access the dashboard
+ 
   useEffect(()=>{
     const token=localStorage.getItem("token");
     if (!token) {
-      navigate("/login"); // redirect if no token
+      navigate("/login"); 
       return;
     }
 
@@ -28,7 +28,7 @@ const Dashboard = () => {
     })
     .then((res) => {
         if (res.status === 401) {
-          navigate("/login"); // invalid token
+          navigate("/login"); 
         }
         return res.json();
       })
@@ -42,10 +42,8 @@ const Dashboard = () => {
 
   const socket = io("http://localhost:8080");
 
-  // Join user's personal room
   socket.emit("joinUser", userId);
 
-  // Listen for alert acknowledgment
   socket.on("alertAcknowledged", (data) => {
     toast.success(data.message, { position: "top-right" });
   });

@@ -2,40 +2,28 @@ const User=require('../models/User');
 const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
 
-
-
-
-// JWT generate function
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
 
-
-
-
-// Register User
 const registerUser = async (req, res) => {
   try {
     const { fullName, phone, email, password, contacts } = req.body;
-     // Validate required fields
+     
     if (!fullName || !email || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-
-    // Check if user already exists
     const userExists = await User.findOne({email});
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await User.create({
       fullName,
       phone,
@@ -55,18 +43,12 @@ const registerUser = async (req, res) => {
   }
 };
 
-
-
-
-
-// Login User
  const loginUser = async (req, res) => {
   try {
     const {name, password } = req.body; 
 
-    const user = await User.findOne({ fullName:name});// yha change h name wlw mein
+    const user = await User.findOne({ fullName:name});
 
-    // user ko check krenge agr vo hai to token generate krenge
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         user: {
@@ -88,18 +70,6 @@ const registerUser = async (req, res) => {
   }
 };
 
-
-
-
-
-
-
-
-
-
-
-
-// Get User Profile only when logged in
 const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -112,9 +82,4 @@ const getUserProfile = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-
-
-
-
 module.exports={registerUser,loginUser,getUserProfile}

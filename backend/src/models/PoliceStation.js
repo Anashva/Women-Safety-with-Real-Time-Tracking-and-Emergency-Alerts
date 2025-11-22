@@ -2,24 +2,21 @@ const mongoose = require("mongoose");
 
 const policeStationSchema = new mongoose.Schema({
   name: { type: String, required: true },
-//   location: {
-//     lat: Number,
-//     lng: Number,
-//   },
-location: {       // ✅ GeoJSON format
+
+location: {       
     type: {
       type: String,
       enum: ["Point"],
       default: "Point",
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
+      type: [Number], 
       required: true,
     },
   },
   username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },  // for login
-  autoToken: { type: String }, // store autologin token
+  password: { type: String, required: true },  
+  autoToken: { type: String }, 
   status: { type: String, enum: ["online", "offline", "busy"], default: "offline" },
   lastHeartbeat: { type: Date }
 });

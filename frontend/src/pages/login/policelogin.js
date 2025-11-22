@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-
 const PoliceLogin = () => {
   const [username, setUsername] = useState(""); // changed from badgeId to username
   const [password, setPassword] = useState("");
@@ -12,7 +11,7 @@ const PoliceLogin = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:8080/api/police/login", {
-        username, // send username instead of badgeId
+        username, 
         password,
       });
 
@@ -95,5 +94,4 @@ const PoliceLogin = () => {
     </div>
   );
 };
-
 export default PoliceLogin;

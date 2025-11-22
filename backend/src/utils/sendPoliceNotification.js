@@ -6,7 +6,6 @@ const sendPoliceNotification = async (station, alert) => {
     `🚨 New SOS Alert sent to ${station.name} for user ${alert.userSnapshot.fullName}`
   );
 
-  // Example: send email notification
   if (station.email) {
     const transporter = nodemailer.createTransport({
       service: "gmail",
