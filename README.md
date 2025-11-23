@@ -6,65 +6,43 @@ A smart, real-time platform to ensure women's safety using advanced tracking, in
 
 ## Objectives
 
-- **Real-Time Location Tracking:** Continuous, live GPS tracking for women during travel or emergencies.
-- **Instant Emergency Alerts:** One-tap SOS alerts to nearby police, emergency contacts, and helplines.
-- **Automated Police Connectivity:** Auto-routes alerts to the nearest available police station.
-- **Anonymity & Security:** Protects user identity while forwarding necessary data to authorities.
-- **Culprit Identification:** Secure upload of suspect photos/videos, sent directly to the police.
-- **24/7 Background System:** App runs safely in the background, always ready for emergencies.
+- Real-Time Location Tracking
+- Instant Emergency Alerts
+- Automated Police Connectivity
+- Anonymity & Security
+- Culprit Identification
+- 24/7 Background System
 
 ---
 
 ## Features & Deliverables
 
-1. **User Registration and Login**
-   - Secure sign up/login (JWT authentication).
-   - Guest/anonymous mode for emergencies.
-
-2. **Real-Time Tracking**
-   - Live user location tracking via GPS.
-   - Shares tracking links with police, friends, or family.
-
-3. **Emergency SOS System**
-   - One-click SOS alert: Notifies police & helplines promptly.
-   - Escalates alert to next station if nearest one is unavailable.
-   - Police see high-priority alert with user’s exact location.
-
-4. **Auto Location Detection**
-   - Automated, precise GPS detection during incident reporting.
-   - Reports logged with time, coordinates, and device info.
-
-5. **Police Station Connectivity**
-   - All stations digitally connected for seamless alerts.
-   - Nearby stations communicate for quick action.
-
-6. **Image/Video Evidence Submission**
-   - Users can instantly upload images/videos of suspects.
-   - Content securely sent to police and stored anonymously in the cloud.
+1. User Registration and Login
+2. Real-Time Tracking
+3. Emergency SOS System
+4. Auto Location Detection
+5. Police Station Connectivity
+6. Image/Video Evidence Submission
 
 ---
 
 ## Advanced Features
 
-- **Heat Maps & Risk Zones:**
-  - Visualizes unsafe areas by aggregating incident reports.
-- **24/7 Background Monitoring:**
-  - Background app auto-detects deviations, sudden stops, and emergencies.
-- **Multilingual Support:**
-  - Available in multiple languages.
-- **Family/Friend Alert System:**
-  - Send parallel SOS and live location to pre-chosen contacts.
+- Heat Maps & Risk Zones
+- 24/7 Background Monitoring
+- Multilingual Support
+- Family/Friend Alert System
 
 ---
 
 ## Technology Stack
 
-- **Backend:** Node.js, Express.js (REST APIs)
-- **Database:** MongoDB
-- **Frontend:** React.js with React Router
-- **Authentication:** JWT Tokens
-- **Real-Time:** Push Notifications & WebSockets
-- **Geolocation:** Native browser & mobile APIs
+- Backend: Node.js, Express.js (REST APIs)
+- Database: MongoDB
+- Frontend: React.js with React Router
+- Authentication: JWT Tokens
+- Real-Time: Push Notifications & WebSockets
+- Geolocation: Native browser & mobile APIs
 
 ---
 
@@ -74,7 +52,7 @@ A smart, real-time platform to ensure women's safety using advanced tracking, in
 
 - Node.js (v16+)
 - MongoDB instance
-- [Optional] Docker (for easy setup)
+- [Optional] Docker
 
 ### Setup
 
