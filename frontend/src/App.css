@@ -40,3 +40,57 @@
 height: 100%;
 width: 100%;
 }
+
+
+
+
+.dashboard-bg {
+  background: linear-gradient(
+      135deg,
+      rgba(0, 102, 255, 0.15),
+      rgba(0, 204, 255, 0.15),
+      rgba(231, 143, 143, 0.5)
+    );
+  background-size: 400% 400%;
+  animation: bgAnimation 15s ease infinite;
+}
+
+/* Smooth animated background */
+@keyframes bgAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
+  background: transparent !important;
+}
+
+
+.dashboard-bg { 
+  background: #de9630; /* soft light cream instead of light blue */
+  min-height: 100vh; 
+}
+.station-box, .station-stats { 
+  background: #e0b271; /* keep cards white for contrast */
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+  padding: 15px; 
+}
+.card, .active-alert-card { 
+  background: #e0cb7f; /* keep alerts cards white */
+  border-left: 4px solid #dc3545; /* active alerts red stays */
+}
+.timeline-item { 
+  background: #e9d26d; /* subtle off-white for timeline */
+}
+.activity-item { 
+  background: #ebb56e; /* subtle off-white for activity snapshot */
+}
+

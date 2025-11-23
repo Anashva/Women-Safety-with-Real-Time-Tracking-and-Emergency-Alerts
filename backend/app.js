@@ -10,7 +10,7 @@ const userRoutes=require('./src/routes/userRoutes');
 const dotenv  = require('dotenv');
 const alertRoutes=require('./src/routes/alertRoutes')
 const policeRoutes=require('./src/routes/policeRoutes');
-
+const path = require('path');
 
 const server = http.createServer(app);
 const io = socketio(server, {
@@ -68,20 +68,54 @@ mongoose.connect('mongodb://127.0.0.1:27017/Women-Safety')
 
 
 // middleware
-app.use(cors({origin:['http://localhost:3000']}));
+// app.use(cors({origin:['http://localhost:3000']}));
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  exposedHeaders: ['Content-Range', 'Content-Length', 'Content-Type']
+}));
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
+app.use('/uploads', (req, res, next) => {
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Accept-Ranges', 'bytes');
+  
+  // Set proper content type based on file extension
+  const ext = req.path.split('.').pop().toLowerCase();
+  if (ext === 'webm') {
+    res.header('Content-Type', 'video/webm');
+  }
+  
+  next();
+});
 
-
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  acceptRanges: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.webm')) {
+      res.setHeader('Content-Type', 'video/webm');
+      res.setHeader('Accept-Ranges', 'bytes');
+    }
+  }
+}));
 
 // app.get('/',(req,res)=>{
 //     res.send("hello everyone 🙏")
 // })
 
 
-
+// Debug endpoint to test file serving
+app.get('/test-upload', (req, res) => {
+  const fs = require('fs');
+  const files = fs.readdirSync('./uploads');
+  res.json({
+    message: 'Files in uploads folder',
+    files: files,
+    path: path.join(__dirname, 'uploads')
+  });
+});
 
 // routes
 app.use('/api/users',userRoutes);

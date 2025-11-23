@@ -59,10 +59,17 @@ const alertSchema = new mongoose.Schema(
     
     // Extra info: culprit photo / voice message etc.
     evidence: {
-      photos: [String], // store image URLs or file paths
-      voiceNotes: [String], // store voice note URLs
+      videoUrl: { type: String, default: null }, // CHANGE YE - add default
+      audioUrl: { type: String, default: null },
+      // photos: [String], // store image URLs or file paths
+      // voiceNotes: [String], // store voice note URLs
       message: { type: String, required:true }, // optional text message
     },
+    alertType: {             // ADD THIS ENTIRE FIELD
+  type: String,
+  enum: ['message', 'video', 'audio'],
+  default: 'message'
+},
     acknowledged: { type: Boolean, default: false },
   },
   { timestamps: true }
