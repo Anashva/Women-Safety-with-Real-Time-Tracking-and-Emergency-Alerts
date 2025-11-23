@@ -4,6 +4,33 @@ A smart, real-time platform to ensure women's safety using advanced tracking, in
 
 ---
 
+## Folder Structure
+
+```
+📁 Women-Safety-with-Real-Time-Tracking-and-Emergency-Alerts/
+├── 📁 backend/
+│   ├── 📁 controllers/
+│   ├── 📁 models/
+│   ├── 📁 routes/
+│   ├── 📁 utils/
+│   ├── app.js
+│   └── ...
+├── 📁 frontend/
+│   ├── 📁 public/
+│   ├── 📁 src/
+│   │   ├── 📁 components/
+│   │   ├── 📁 pages/
+│   │   ├── App.js
+│   │   └── ...
+│   └── ...
+├── .env.example
+├── package.json
+├── README.md
+└── ...
+```
+
+---
+
 ## Objectives
 
 - Real-Time Location Tracking
@@ -37,12 +64,13 @@ A smart, real-time platform to ensure women's safety using advanced tracking, in
 
 ## Technology Stack
 
-- Backend: Node.js, Express.js (REST APIs)
-- Database: MongoDB
-- Frontend: React.js with React Router
-- Authentication: JWT Tokens
-- Real-Time: Push Notifications & WebSockets
-- Geolocation: Native browser & mobile APIs
+- ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white&style=flat)  **Backend:** Node.js
+- ![Express](https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=white&style=flat)  **API:** Express.js (REST APIs)
+- ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb&logoColor=white&style=flat)  **Database:** MongoDB
+- ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=white&style=flat)  **Frontend:** React.js & React Router
+- ![JWT](https://img.shields.io/badge/JWT-black?logo=jsonwebtokens&logoColor=white&style=flat)  **Authentication:** JWT Tokens
+- ![Socket.io](https://img.shields.io/badge/WebSockets-010101?logo=socket.io&logoColor=white&style=flat) **Real-Time:** Push Notifications & WebSockets
+- 🌏 **Geolocation:** Native browser & mobile APIs
 
 ---
 
