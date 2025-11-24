@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-
 const AlertHistory = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +41,10 @@ const AlertHistory = () => {
 
   return (
     <div className="container mt-5">
-      <button onClick={() => navigate("/dashboard")} className="btn btn-danger mb-4">
+      <button
+        onClick={() => navigate("/dashboard")}
+        className="btn btn-danger mb-4"
+      >
         Back to Dashboard
       </button>
 
@@ -66,33 +68,37 @@ const AlertHistory = () => {
                 <td>{index + 1}</td>
                 <td>{alert.evidence?.message || "No message"}</td>
                 <td>
-  {alert.location?.coordinates ? (
-    <Link
-      to={`https://www.google.com/maps?q=${alert.location.coordinates[1]},${alert.location.coordinates[0]}`}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-       View on Map
-    </Link>
-  ) : (
-    "N/A"
-  )}
-</td>
-<td>
-  <span
-    className={`badge ${
-      alert.status === "resolved"
-        ? "bg-success"
-        : alert.status === "in-progress"
-        ? "bg-warning text-dark"
-        : alert.status === "pending" || alert.status === "active"
-        ? "bg-danger"
-        : "bg-secondary"
-    }`}
-  >
-    {alert.status ? alert.status.charAt(0).toUpperCase() + alert.status.slice(1) : "Unknown"}
-  </span>
-</td>
+                  {alert.location?.coordinates ? (
+                    <Link
+                      to={`https://www.google.com/maps?q=${alert.location.coordinates[1]},${alert.location.coordinates[0]}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View on Map
+                    </Link>
+                  ) : (
+                    "N/A"
+                  )}
+                </td>
+                <td>
+                  <span
+                    className={`badge ${
+                      alert.status === "resolved"
+                        ? "bg-success"
+                        : alert.status === "in-progress"
+                        ? "bg-warning text-dark"
+                        : alert.status === "pending" ||
+                          alert.status === "active"
+                        ? "bg-danger"
+                        : "bg-secondary"
+                    }`}
+                  >
+                    {alert.status
+                      ? alert.status.charAt(0).toUpperCase() +
+                        alert.status.slice(1)
+                      : "Unknown"}
+                  </span>
+                </td>
 
                 {/* <td>
                   <span

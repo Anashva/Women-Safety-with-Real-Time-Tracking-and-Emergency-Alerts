@@ -1,18 +1,18 @@
 const express = require("express");
-const router=express.Router();
-const {createAlert,getMyAlerts,acknowledgeAlert}=require("../controllers/alertControllers")
-const {authMiddleware}=require("../middleware/authMiddleware")
-const Alert=require('../models/Alert')
+const router = express.Router();
+const {
+  createAlert,
+  getMyAlerts,
+  acknowledgeAlert,
+} = require("../controllers/alertControllers");
+const { authMiddleware } = require("../middleware/authMiddleware");
+const Alert = require("../models/Alert");
 
 // creating sos alert
-router.post("/",authMiddleware,createAlert)
-
-
-
+router.post("/", authMiddleware, createAlert);
 
 // get all alerts
-router.get("/my",authMiddleware,getMyAlerts);
-
+router.get("/my", authMiddleware, getMyAlerts);
 
 // get all alerts (for police dashboard)
 router.get("/all", async (req, res) => {
@@ -30,5 +30,4 @@ router.get("/all", async (req, res) => {
 //  route to acknowledge an alert
 router.post("/acknowledge/:id", authMiddleware, acknowledgeAlert);
 
-
-module.exports=router
+module.exports = router;

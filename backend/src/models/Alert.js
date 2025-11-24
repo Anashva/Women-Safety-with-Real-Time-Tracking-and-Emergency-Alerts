@@ -1,4 +1,4 @@
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 
 const alertSchema = new mongoose.Schema(
   {
@@ -55,15 +55,15 @@ const alertSchema = new mongoose.Schema(
       ref: "PoliceStation",
     },
 
-
-    
     // Extra info: culprit photo / voice message etc.
     evidence: {
       photos: [String], // store image URLs or file paths
       voiceNotes: [String], // store voice note URLs
-      message: { type: String, required:true }, // optional text message
+      message: { type: String, required: true }, // optional text message
     },
     acknowledged: { type: Boolean, default: false },
+    riskLevel: { type: String, default: "low" },
+    riskColor: { type: String, default: "green" },
   },
   { timestamps: true }
 );
@@ -71,22 +71,5 @@ const alertSchema = new mongoose.Schema(
 // For geo queries
 alertSchema.index({ location: "2dsphere" });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let Alert=mongoose.model('Alert',alertSchema)
-module.exports=Alert
+let Alert = mongoose.model("Alert", alertSchema);
+module.exports = Alert;

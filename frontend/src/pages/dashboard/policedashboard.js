@@ -159,7 +159,21 @@ const PoliceDashboardPage = () => {
                 className={`card shadow-sm h-100 ${
                   newAlertIds.includes(alert._id) ? "border-4" : ""
                 }`}
-                style={{ borderColor: "#dc3545", backgroundColor: "#fff5f5" }}
+                style={{
+                  borderColor:
+                    alert.riskColor === "red"
+                      ? "#ff4d4d"
+                      : alert.riskColor === "yellow"
+                      ? "#e6c300"
+                      : "#28a745",
+
+                  backgroundColor:
+                    alert.riskColor === "red"
+                      ? "#ffe5e5"
+                      : alert.riskColor === "yellow"
+                      ? "#fff8d1"
+                      : "#e8ffe8",
+                }}
               >
                 <div
                   className="card-header fw-bold"
@@ -168,6 +182,31 @@ const PoliceDashboardPage = () => {
                   {alert.userSnapshot?.fullName || "Unknown User"}
                 </div>
                 <div className="card-body">
+                  <p>
+                    <b>Risk Level:</b>{" "}
+                    <span
+                      style={{
+                        padding: "3px 8px",
+                        borderRadius: "5px",
+                        backgroundColor:
+                          alert.riskColor === "red"
+                            ? "#ffcccc"
+                            : alert.riskColor === "yellow"
+                            ? "#fff2b3"
+                            : "#ccffcc",
+                        color:
+                          alert.riskColor === "red"
+                            ? "#b30000"
+                            : alert.riskColor === "yellow"
+                            ? "#806600"
+                            : "#006600",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {alert.riskLevel?.toUpperCase() || "LOW"}
+                    </span>
+                  </p>
+
                   <p>
                     <b>Message:</b> {alert.evidence?.message}
                   </p>
