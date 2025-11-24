@@ -14,30 +14,78 @@ const path = require('path');
 
 const server = http.createServer(app);
 const io = socketio(server, {
-  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"], credentials: true  },
 });
+
+
 
 app.set("io", io); 
 
+
+// ===============================
+// GLOBAL SOCKET STORAGE
+// ===============================
+global.activePoliceSockets = {}; // stationId -> Set<socketIds>
+global.activeUserSockets = {};   // userId -> Set<socketIds>
+
+
 // Track connected police
 io.on("connection", (socket) => {
-  console.log("Police connected:", socket.id);
+  // console.log("Police connected:", socket.id);
+  console.log(" police Socket connected:", socket.id);
 
-  socket.on("joinPolice", (stationId) => {
-    socket.join("onlinePolice");
+
+  socket.on("joinPolice", async (stationId) => {
+    // socket.join("onlinePolice");
+    if (!stationId) return;
+    socket.join(stationId.toString());
     console.log(`Police ${stationId} joined`);
+
+
+    if (!global.activePoliceSockets[stationId]) global.activePoliceSockets[stationId] = new Set();
+    global.activePoliceSockets[stationId].add(socket.id);
+
+    const PoliceStation = require("./src/models/PoliceStation");
+    await PoliceStation.findByIdAndUpdate(stationId, { status: "online" });
+
+    console.log(`Police joined: ${stationId} (${global.activePoliceSockets[stationId].size} active)`)
+
+
+    socket.on("disconnect", async () => {
+      global.activePoliceSockets[stationId].delete(socket.id);
+      if (global.activePoliceSockets[stationId].size === 0) {
+        await PoliceStation.findByIdAndUpdate(stationId, { status: "offline" });
+      }
+      console.log(`Police disconnected: ${stationId}`);
+    });
   });
+
+
+
 
   // ser joins their own room
   socket.on("joinUser", (userId) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined`);
+    // socket.join(userId);
+    // console.log(`User ${userId} joined`);
+
+    if (!userId) return;
+    socket.join(userId.toString());
+
+    if (!global.activeUserSockets[userId]) global.activeUserSockets[userId] = new Set();
+    global.activeUserSockets[userId].add(socket.id);
+
+    console.log(`User joined: ${userId}`);
+
+    socket.on("disconnect", () => {
+      global.activeUserSockets[userId].delete(socket.id);
+      console.log(`User disconnected: ${userId}`);
+    });
   });
 
 
-  socket.on("disconnect", () => {
-    console.log("Police disconnected");
-  });
+  // socket.on("disconnect", () => {
+  //   console.log("Police disconnected");
+  // });
 });
 
 

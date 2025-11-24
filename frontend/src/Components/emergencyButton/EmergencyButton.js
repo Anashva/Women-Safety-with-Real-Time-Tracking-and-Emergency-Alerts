@@ -202,7 +202,7 @@ const EmergencyButton = () => {
 
           await res.json();
           alert("🚨 Message SOS Sent!");
-          navigate("/live-tracking");
+          navigate("/dashboard");
         } catch (err) {
           console.error(err);
           alert("Failed to send SOS");
@@ -256,7 +256,7 @@ const EmergencyButton = () => {
           await res.json();
           alert("🎥 Video SOS Sent!");
           setVideoBlob(null);
-          navigate("/live-tracking");
+          navigate("/dashboard");
         } catch (err) {
           console.error(err);
           alert("Failed to send video");
@@ -310,7 +310,7 @@ const EmergencyButton = () => {
           await res.json();
           alert("🎤 Audio SOS Sent!");
           setAudioBlob(null);
-          navigate("/live-tracking");
+          navigate("/dashboard");
         } catch (err) {
           console.error(err);
           alert("Failed to send audio");

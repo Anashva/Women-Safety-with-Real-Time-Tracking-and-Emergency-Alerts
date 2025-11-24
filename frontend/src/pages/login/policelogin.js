@@ -86,7 +86,7 @@ const PoliceLogin = () => {
           {/* Register link */}
           <p className="text-center mt-3 mb-0">
             Don’t have an account?{" "}
-            <Link to="/police-register" className="text-danger fw-bold">
+            <Link to="/police/register" className="text-danger fw-bold">
               Register here
             </Link>
           </p>
