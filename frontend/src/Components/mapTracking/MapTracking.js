@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router-dom";
+
+
 const RecenterMap = ({ coords }) => {
   const map = useMap();
   useEffect(() => {
@@ -26,6 +28,9 @@ const MapTracking = () => {
       return () => navigator.geolocation.clearWatch(watchId); // cleanup
     }
   }, []);
+
+  const iframeUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`;
+
 const navigate = useNavigate();
   return (
     <div>
@@ -38,17 +43,15 @@ const navigate = useNavigate();
 
 
       <h2>📍 My Location</h2>
-      <MapContainer
-        center={coords}
-        zoom={20}
-        style={{ height: "700px", width: "100%" }}
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <Marker position={coords}>
-          <Popup>🚶 You are here</Popup>
-        </Marker>
-        <RecenterMap coords={coords} />
-      </MapContainer>
+      <iframe
+        title="Live Location"
+        src={iframeUrl}
+        width="100%"
+        height="600"
+        style={{ border: 0 }}
+        allowFullScreen=""
+        loading="lazy"
+      ></iframe>
     </div>
   );
 };

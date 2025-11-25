@@ -71,6 +71,8 @@ const alertSchema = new mongoose.Schema(
   default: 'message'
 },
     acknowledged: { type: Boolean, default: false },
+    riskLevel: { type: String, default: "low" },
+    riskColor: { type: String, default: "green" },
   },
   { timestamps: true }
 );

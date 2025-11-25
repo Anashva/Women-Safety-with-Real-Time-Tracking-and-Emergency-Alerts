@@ -472,7 +472,6 @@
 
 
 
-// ...existing code...
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import io from "socket.io-client";
@@ -482,7 +481,12 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet"
 import "leaflet/dist/leaflet.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BellRing, MapPin, User, CheckCircle, AlertTriangle, DownloadCloud, RefreshCw, Camera } from "lucide-react";
-import "../../App.css"; // optional - you can keep inline styles below
+import "../../App.css"; 
+
+
+
+
+
 
 // --- Mock nearby units (used for simple nearest-unit suggestion) ---
 const mockUnits = [
@@ -507,6 +511,10 @@ const PoliceDashboardPage = () => {
   const [aiSummary, setAiSummary] = useState("");
   const [predictedRoute, setPredictedRoute] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [coords, setCoords] = useState([28.7041, 77.1025]); // default Delhi
+
+    const iframeUrl = `https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`;
+
 
   // refs
   const socketRef = useRef(null);
@@ -516,6 +524,14 @@ const PoliceDashboardPage = () => {
   // auth/station
   const token = localStorage.getItem("policeToken");
   const rawStationId = localStorage.getItem("policeStationId");
+
+
+  const alertSound = () => {
+    const audio = new Audio("/siren.mp3");
+    audio.play().catch(() => {});
+  };
+
+
 
   // Normalize ids (handles ObjectId, {$oid:...}, raw strings)
   const normalizeId = (id) => {
@@ -539,6 +555,23 @@ const PoliceDashboardPage = () => {
   };
 
   const cleanStationId = normalizeId(rawStationId);
+
+
+  useEffect(() => {
+      if (navigator.geolocation) {
+        const watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            setCoords([pos.coords.latitude, pos.coords.longitude]);
+          },
+          (err) => console.error("Error watching location:", err),
+          { enableHighAccuracy: true, maximumAge: 0 }
+        );
+  
+        return () => navigator.geolocation.clearWatch(watchId); // cleanup
+      }
+    }, []);
+
+
 
   // Initialize shared siren audio (looped)
   useEffect(() => {
@@ -797,133 +830,289 @@ const PoliceDashboardPage = () => {
 
         {/* Active Alerts */}
         <h3 className="mb-3 text-danger">🚨 Active Alerts</h3>
-        {alerts.length === 0 ? <p className="text-muted">No active alerts yet.</p> : (
-          <div className="row">
-            {alerts.map((alert) => (
-              <div key={alert._id} className={`col-md-6 mb-4 ${newAlertIds.includes(alert._id) ? "blink-alert" : ""}`}>
-                <div className={`card active-alert-card shadow-lg h-100 ${newAlertIds.includes(alert._id) ? "blink-alert" : ""}`}>
-                  <div className="card-header d-flex justify-content-between align-items-center">
-                    <div className="fw-bold d-flex align-items-center gap-2">
-                      <AlertTriangle size={16} /> {alert.userSnapshot?.fullName || "Unknown User"}
-                    </div>
-                    <div>
-                      <span className={`badge badge-alert-type ${alert.alertType === "video" ? "bg-primary" : alert.alertType === "audio" ? "bg-info text-dark" : "bg-secondary text-white"}`}>
-                        {alert.alertType ? alert.alertType.toUpperCase() : "MESSAGE"}
-                      </span>
-                    </div>
-                  </div>
+        {alerts.length === 0 ? (
+  <p className="text-muted">No active alerts yet.</p>
+) : (
+  <div className="row">
+    {alerts.map((alert) => (
+      <div
+        key={alert._id}
+        className={`col-md-6 mb-4 ${
+          newAlertIds.includes(alert._id) ? "blink-alert" : ""
+        }`}
+      >
+        <div
+          className={`card active-alert-card shadow-lg h-100 ${
+            newAlertIds.includes(alert._id) ? "blink-alert" : ""
+          }`}
+          style={{
+            borderColor:
+              alert.riskColor === "red"
+                ? "#ff4d4d"
+                : alert.riskColor === "yellow"
+                ? "#e6c300"
+                : "#28a745",
 
-                  <div className="card-body">
-                    <p><b>Message:</b> {alert.evidence?.message}</p>
+            backgroundColor:
+              alert.riskColor === "red"
+                ? "#ffe5e5"
+                : alert.riskColor === "yellow"
+                ? "#fff8d1"
+                : "#e8ffe8",
+          }}
+        >
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <div className="fw-bold d-flex align-items-center gap-2">
+              <AlertTriangle size={16} />{" "}
+              {alert.userSnapshot?.fullName || "Unknown User"}
+            </div>
 
-                    {/* Video */}
-                    {alert.evidence?.videoUrl && (
-                      <div className="mb-3">
-                        <video controls preload="auto" playsInline style={{ width: '100%', maxHeight: '250px', borderRadius: '8px', backgroundColor: '#000' }}>
-                          <source src={`${BASE}${alert.evidence.videoUrl}`} type="video/webm" />
-                          Your browser does not support video playback.
-                        </video>
-                        <div className="mt-2 d-flex gap-2">
-                          <a href={`${BASE}${alert.evidence.videoUrl}`} download className="btn btn-sm btn-outline-primary">
-                            <DownloadCloud size={14} className="me-1" /> Download Video
-                          </a>
-                        </div>
-                      </div>
-                    )}
+            <div>
+              <span
+                className={`badge badge-alert-type ${
+                  alert.alertType === "video"
+                    ? "bg-primary"
+                    : alert.alertType === "audio"
+                    ? "bg-info text-dark"
+                    : "bg-secondary text-white"
+                }`}
+              >
+                {alert.alertType ? alert.alertType.toUpperCase() : "MESSAGE"}
+              </span>
+            </div>
+          </div>
 
-                    {/* Audio */}
-                    {alert.evidence?.audioUrl && (
-                      <div className="mb-3">
-                        <audio controls preload="auto" style={{ width: '100%' }}>
-                          <source src={`${BASE}${alert.evidence.audioUrl}`} type="audio/webm" />
-                          Your browser does not support audio playback.
-                        </audio>
-                      </div>
-                    )}
+          <div className="card-body">
+            {/* 🔥🔥 RISK LEVEL ADDED (from 2nd code) */}
+            <p>
+              <b>Risk Level:</b>{" "}
+              <span
+                style={{
+                  padding: "3px 8px",
+                  borderRadius: "5px",
+                  backgroundColor:
+                    alert.riskColor === "red"
+                      ? "#ffcccc"
+                      : alert.riskColor === "yellow"
+                      ? "#fff2b3"
+                      : "#ccffcc",
+                  color:
+                    alert.riskColor === "red"
+                      ? "#b30000"
+                      : alert.riskColor === "yellow"
+                      ? "#806600"
+                      : "#006600",
+                  fontWeight: "bold",
+                }}
+              >
+                {alert.riskLevel?.toUpperCase() || "LOW"}
+              </span>
+            </p>
+            {/* 🔥🔥 RISK LEVEL END */}
 
-                    <p><b>Phone:</b> {alert.userSnapshot?.phone || "N/A"}</p>
-                    <p><b>Email:</b> {alert.userSnapshot?.email || "N/A"}</p>
+            <p>
+              <b>Message:</b> {alert.evidence?.message}
+            </p>
 
-                    {alert.contactsSnapshot?.length > 0 && (
-                      <>
-                        <p><b>Emergency Contacts:</b></p>
-                        <ul>{alert.contactsSnapshot.map((c, idx) => <li key={idx}>{c.name} — {c.phone}</li>)}</ul>
-                      </>
-                    )}
+            {/* Video */}
+            {alert.evidence?.videoUrl && (
+              <div className="mb-3">
+                <video
+                  controls
+                  preload="auto"
+                  playsInline
+                  style={{
+                    width: "100%",
+                    maxHeight: "250px",
+                    borderRadius: "8px",
+                    backgroundColor: "#000",
+                  }}
+                >
+                  <source
+                    src={`${BASE}${alert.evidence.videoUrl}`}
+                    type="video/webm"
+                  />
+                  Your browser does not support video playback.
+                </video>
 
-                    <p><b>Location:</b> {alert.location?.coordinates ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}` : "Not available"}</p>
-                    <p><b>Time:</b> {new Date(alert.createdAt).toLocaleString()}</p>
-
-                    {alert.location?.coordinates && (
-                      <button className="btn btn-sm btn-outline-primary mb-2 me-2" onClick={() => toggleMap(alert._id)}>
-                        {showMap[alert._id] ? "Hide Map" : "View on Map"}
-                      </button>
-                    )}
-
-                    {/* AI Summary / Predict / Camera */}
-                    <div className="mb-2">
-                      <button className="btn btn-sm btn-outline-success me-2" onClick={() => handleShowAiSummary(alert)}>🧠 AI Summary</button>
-                      <button className="btn btn-sm btn-outline-warning me-2" onClick={() => handlePredictRoute(alert)}>🗺 Predict Route</button>
-                      {alert.alertType === "video" && (
-                        <button className="btn btn-sm btn-outline-info" onClick={() => handleToggleCamera(alert)}><Camera size={14} /> Camera</button>
-                      )}
-                    </div>
-
-                    {selectedAlert?._id === alert._id && aiSummary && (
-                      <div className="card p-3 mb-2" style={{ background: "#f8fafc" }}>
-                        <div style={{ fontWeight: 700 }}>AI Incident Summary</div>
-                        <div className="small text-muted mt-1">{aiSummary}</div>
-                      </div>
-                    )}
-
-                    {selectedAlert?._id === alert._id && showCamera && (
-                      <div className="card p-2 mb-2">
-                        <div style={{ fontWeight: 700 }} className="mb-1">Live Camera Stream</div>
-                        <video controls style={{ width: "100%", borderRadius: 8 }}>
-                          <source src={`${BASE}${alert.evidence.videoUrl}`} type="video/webm" />
-                          Your browser doesn't support video.
-                        </video>
-                        <div className="small text-muted mt-1">UI-only camera panel (mock stream)</div>
-                      </div>
-                    )}
-
-                    {showMap[alert._id] && alert.location?.coordinates && (
-                      <MapContainer center={[alert.location.coordinates[1], alert.location.coordinates[0]]} zoom={13} style={{ height: "200px", width: "100%" }}>
-                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                        <Marker position={[alert.location.coordinates[1], alert.location.coordinates[0]]}>
-                          <Popup>{alert.userSnapshot?.fullName}<br/>{alert.evidence?.message}</Popup>
-                        </Marker>
-                        {predictedRoute && selectedAlert?._id === alert._id && predictedRoute.route && (
-                          <Polyline positions={predictedRoute.route} pathOptions={{ color: "orange", weight: 4, dashArray: "6" }} />
-                        )}
-                      </MapContainer>
-                    )}
-
-                    <div className="d-flex justify-content-between align-items-center mt-3">
-                      <div>
-                        {alert.acknowledged ? (
-                          <div className="ack-box mt-1 p-3 text-center">
-                            <CheckCircle size={24} className="text-success mb-1" />
-                            <div style={{ fontWeight: 700, color: "#198754" }}>Alert Resolved</div>
-                            <div className="small text-muted">Acknowledged by station</div>
-                          </div>
-                        ) : (
-                          <span className="text-danger small"><AlertTriangle size={14} /> Awaiting Ack</span>
-                        )}
-                      </div>
-
-                      <div>
-                        {!alert.acknowledged && (
-                          <button className="btn btn-sm btn-custom-danger me-2" onClick={() => acknowledgeAlert(alert._id)}>✅ Acknowledge</button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                <div className="mt-2 d-flex gap-2">
+                  <a
+                    href={`${BASE}${alert.evidence.videoUrl}`}
+                    download
+                    className="btn btn-sm btn-outline-primary"
+                  >
+                    <DownloadCloud size={14} className="me-1" /> Download
+                    Video
+                  </a>
                 </div>
               </div>
-            ))}
+            )}
+
+            {/* Audio */}
+            {alert.evidence?.audioUrl && (
+              <div className="mb-3">
+                <audio controls preload="auto" style={{ width: "100%" }}>
+                  <source
+                    src={`${BASE}${alert.evidence.audioUrl}`}
+                    type="audio/webm"
+                  />
+                  Your browser does not support audio playback.
+                </audio>
+              </div>
+            )}
+
+            <p>
+              <b>Phone:</b> {alert.userSnapshot?.phone || "N/A"}
+            </p>
+
+            <p>
+              <b>Email:</b> {alert.userSnapshot?.email || "N/A"}
+            </p>
+
+            {alert.contactsSnapshot?.length > 0 && (
+              <>
+                <p>
+                  <b>Emergency Contacts:</b>
+                </p>
+                <ul>
+                  {alert.contactsSnapshot.map((c, idx) => (
+                    <li key={idx}>
+                      {c.name} — {c.phone}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p>
+              <b>Location:</b>{" "}
+              {alert.location?.coordinates
+                ? `${alert.location.coordinates[1]}, ${alert.location.coordinates[0]}`
+                : "Not available"}
+            </p>
+
+            <p>
+              <b>Time:</b> {new Date(alert.createdAt).toLocaleString()}
+            </p>
+
+            {/* Map toggle */}
+            {alert.location?.coordinates && (
+              <button
+                className="btn btn-sm btn-outline-primary mb-2 me-2"
+                onClick={() => toggleMap(alert._id)}
+              >
+                {showMap[alert._id] ? "Hide Map" : "View on Map"}
+              </button>
+            )}
+
+            {/* AI Summary / Predict Route / Camera */}
+            <div className="mb-2">
+              <button
+                className="btn btn-sm btn-outline-success me-2"
+                onClick={() => handleShowAiSummary(alert)}
+              >
+                🧠 AI Summary
+              </button>
+
+              <button
+                className="btn btn-sm btn-outline-warning me-2"
+                onClick={() => handlePredictRoute(alert)}
+              >
+                🗺 Predict Route
+              </button>
+
+              {alert.alertType === "video" && (
+                <button
+                  className="btn btn-sm btn-outline-info"
+                  onClick={() => handleToggleCamera(alert)}
+                >
+                  <Camera size={14} /> Camera
+                </button>
+              )}
+            </div>
+
+            {/* AI Summary Panel */}
+            {selectedAlert?._id === alert._id && aiSummary && (
+              <div className="card p-3 mb-2" style={{ background: "#f8fafc" }}>
+                <div style={{ fontWeight: 700 }}>AI Incident Summary</div>
+                <div className="small text-muted mt-1">{aiSummary}</div>
+              </div>
+            )}
+
+            {/* Camera Panel */}
+            {selectedAlert?._id === alert._id && showCamera && (
+              <div className="card p-2 mb-2">
+                <div
+                  style={{ fontWeight: 700 }}
+                  className="mb-1"
+                >
+                  Live Camera Stream
+                </div>
+
+                <video controls style={{ width: "100%", borderRadius: 8 }}>
+                  <source
+                    src={`${BASE}${alert.evidence.videoUrl}`}
+                    type="video/webm"
+                  />
+                </video>
+
+                <div className="small text-muted mt-1">
+                  UI-only camera panel (mock stream)
+                </div>
+              </div>
+            )}
+
+            {/* Map iframe */}
+            {showMap[alert._id] && alert.location?.coordinates && (
+              <iframe
+                title="Live Location"
+                src={iframeUrl}
+                width="100%"
+                height="600"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+              ></iframe>
+            )}
+
+            {/* Footer – Acknowledge */}
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div>
+                {alert.acknowledged ? (
+                  <div className="ack-box mt-1 p-3 text-center">
+                    <CheckCircle size={24} className="text-success mb-1" />
+                    <div style={{ fontWeight: 700, color: "#198754" }}>
+                      Alert Resolved
+                    </div>
+                    <div className="small text-muted">
+                      Acknowledged by station
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-danger small">
+                    <AlertTriangle size={14} /> Awaiting Ack
+                  </span>
+                )}
+              </div>
+
+              <div>
+                {!alert.acknowledged && (
+                  <button
+                    className="btn btn-sm btn-custom-danger me-2"
+                    onClick={() => acknowledgeAlert(alert._id)}
+                  >
+                    ✅ Acknowledge
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
 
         {/* Handled Alerts Modal */}
         {showHandledModal && (
@@ -1005,5 +1194,4 @@ const PoliceDashboardPage = () => {
   );
 };
 
-export default PoliceDashboardPage;
-// ...existing code...
+export default PoliceDashboardPage; 

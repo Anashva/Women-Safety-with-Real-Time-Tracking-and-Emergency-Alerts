@@ -1,9 +1,10 @@
 const express = require("express");
 const router=express.Router();
 const {createAlert,getMyAlerts,acknowledgeAlert,uploadFields,getAllAlertsForPolice}=require("../controllers/alertControllers")
-// const {createAlert,getMyAlerts,acknowledgeAlert}=require("../controllers/alertControllers")
 const {authMiddleware}=require("../middleware/authMiddleware")
 const Alert=require('../models/Alert')
+
+
 
 // creating sos alert
 router.post("/",authMiddleware,uploadFields,createAlert)

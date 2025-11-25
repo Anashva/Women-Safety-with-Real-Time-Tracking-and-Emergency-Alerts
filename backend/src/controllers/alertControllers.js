@@ -4,6 +4,9 @@ const User = require("../models/User");
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const getRiskLevel=require("../utils/getRiskLevel");
+
+
 
 
 // ------------------ DISTANCE FUNCTION ------------------
@@ -49,6 +52,8 @@ const createAlert = async (req, res) => {
     const user = await User.findById(req.user._id).select("fullName phone email contacts");
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    //  Get risk based on alert frequency
+    const { level, color } = await getRiskLevel(latitude, longitude);
 
     // let nearestPolice = await PoliceStation.findOne({
     //   status: "online",
@@ -72,7 +77,7 @@ const createAlert = async (req, res) => {
 
     // ------------------ PICK NEAREST POLICE ------------------
     let nearestPolice = null;
-    let minDistance = Infinity;
+    let minDistance = Infinity;//dis from each station
 
     onlinePolice.forEach((station) => {
       if (!station.location?.coordinates) return;
@@ -130,8 +135,13 @@ const createAlert = async (req, res) => {
       alertType: alertType || 'message',
       status: "pending",
       acknowledged: false,
+
+      // RISK DATA
+      riskLevel: level,
+      riskColor: color,
     });
 
+    
     if (nearestPolice) {
       alert.nearestPoliceId = nearestPolice._id;
       await alert.save();

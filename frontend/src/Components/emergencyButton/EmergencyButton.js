@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Loader2, Video, Mic, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
+
+
 const EmergencyButton = () => {
   const [loading, setLoading] = useState(false);
   const [isRecordingVideo, setIsRecordingVideo] = useState(false);
