@@ -21,12 +21,12 @@ The **Women Safety Platform** is a cutting-edge web and mobile application desig
 
 ### 🎯 Core Objectives
 
-- ✅ **Real-Time Location Tracking** - Continuous GPS monitoring
-- ✅ **Instant Emergency Alerts** - One-tap SOS system
-- ✅ **Automated Police Connectivity** - Direct connection to nearest station
-- ✅ **Anonymity & Security** - End-to-end encryption
-- ✅ **Evidence Collection** - Image/video submission capability
-- ✅ **24/7 Background Monitoring** - Always-on protection
+-  **Real-Time Location Tracking** - Continuous GPS monitoring
+-  **Instant Emergency Alerts** - One-tap SOS system
+-  **Automated Police Connectivity** - Direct connection to nearest station
+-  **Anonymity & Security** - End-to-end encryption
+-  **Evidence Collection** - Image/video submission capability
+-  **24/7 Background Monitoring** - Always-on protection
 
 ---
 
@@ -363,11 +363,11 @@ We welcome contributions from the community! Here's how you can help:
 
 ### Contribution Guidelines
 
-- ✅ Follow the existing code style
-- ✅ Write meaningful commit messages
-- ✅ Update documentation as needed
-- ✅ Test your changes thoroughly
-- ✅ Be respectful and inclusive
+-  Follow the existing code style
+-  Write meaningful commit messages
+-  Update documentation as needed
+-  Test your changes thoroughly
+-  Be respectful and inclusive
 
 ---
 
@@ -395,17 +395,6 @@ Chrome → Settings → Privacy → Location
 
 ---
 
-## 📊 Roadmap
-
-- [ ] Mobile App (React Native)
-- [ ] AI-based threat detection
-- [ ] Offline mode support
-- [ ] Voice-activated SOS
-- [ ] Integration with smart wearables
-- [ ] Community safety features
-- [ ] Multi-language support expansion
-
----
 
 ## 📄 License
 
@@ -420,25 +409,6 @@ Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction...
 ```
-
----
-
-## 💬 Support
-
-Need help? We're here for you!
-
-- 📧 **Email:** support@womensafety.com
-- 💬 **Discord:** [Join our community](https://discord.gg/womensafety)
-- 🐛 **Issues:** [GitHub Issues](https://github.com/Anashva/Women-Safety-Platform/issues)
-- 📖 **Docs:** [Full Documentation](https://docs.womensafety.com)
-
----
-
-## 🙏 Acknowledgments
-
-- Thanks to all contributors who have helped build this platform
-- Special thanks to law enforcement agencies for their cooperation
-- Inspired by initiatives to make the world safer for everyone
 
 ---
 
