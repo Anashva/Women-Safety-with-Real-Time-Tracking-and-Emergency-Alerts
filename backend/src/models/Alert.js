@@ -45,24 +45,34 @@ const alertSchema = new mongoose.Schema(
     // Status of alert
     status: {
       type: String,
-      enum: ["pending", "active", "resolved"],
-      default: "active",
+      enum: ["pending", "in-progress", "resolved"],
+      default: "pending",
     },
 
     // Optional: Nearest police reference (if you are mapping police stations in DB)
     nearestPoliceId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Police",
+      ref: "PoliceStation",
     },
 
 
     
     // Extra info: culprit photo / voice message etc.
     evidence: {
-      photos: [String], // store image URLs or file paths
-      voiceNotes: [String], // store voice note URLs
+      videoUrl: { type: String, default: null }, // CHANGE YE - add default
+      audioUrl: { type: String, default: null },
+      // photos: [String], // store image URLs or file paths
+      // voiceNotes: [String], // store voice note URLs
       message: { type: String, required:true }, // optional text message
     },
+    alertType: {             // ADD THIS ENTIRE FIELD
+  type: String,
+  enum: ['message', 'video', 'audio'],
+  default: 'message'
+},
+    acknowledged: { type: Boolean, default: false },
+    riskLevel: { type: String, default: "low" },
+    riskColor: { type: String, default: "green" },
   },
   { timestamps: true }
 );
