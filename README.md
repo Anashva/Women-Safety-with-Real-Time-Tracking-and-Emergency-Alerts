@@ -36,12 +36,12 @@ The **Women Safety Platform** is a cutting-edge web and mobile application desig
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **User Authentication** | Secure JWT-based login/registration | ✅ Active |
-| **Real-Time GPS Tracking** | Continuous location monitoring | ✅ Active |
-| **Emergency SOS Button** | One-tap emergency alert system | ✅ Active |
-| **Auto Location Detection** | Automatic GPS coordinates capture | ✅ Active |
-| **Police Station Integration** | Direct alerts to nearest station | ✅ Active |
-| **Evidence Upload** | Image/Video submission support | ✅ Active |
+| **User Authentication** | Secure JWT-based login/registration |  Active |
+| **Real-Time GPS Tracking** | Continuous location monitoring | Active |
+| **Emergency SOS Button** | One-tap emergency alert system |  Active |
+| **Auto Location Detection** | Automatic GPS coordinates capture |  Active |
+| **Police Station Integration** | Direct alerts to nearest station |  Active |
+| **Evidence Upload** | Image/Video submission support |  Active |
 
 ### 🚀 Advanced Features
 
@@ -209,16 +209,7 @@ PORT=3000
 5. Grant location permissions
 ```
 
-#### 2. Setting Up Profile
-
-```
-1. Navigate to Settings → Profile
-2. Update your personal information
-3. Grant location permissions
-4. Save your settings
-```
-
-#### 3. Using SOS Feature
+#### 2. Using SOS Feature
 
 ```
 🚨 IN CASE OF EMERGENCY:
@@ -232,7 +223,7 @@ PORT=3000
 4. Continue holding for continuous updates
 ```
 
-#### 4. Uploading Evidence
+#### 3. Uploading Evidence
 
 ```
 1. Click "Upload Evidence"
@@ -241,7 +232,7 @@ PORT=3000
 4. Submit (files are encrypted before upload)
 ```
 
-#### 5. Viewing Safe/Unsafe Zones
+#### 4. Viewing Safe/Unsafe Zones
 
 ```
 1. Navigate to "Heat Map" section
