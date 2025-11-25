@@ -15,22 +15,6 @@
 
 ---
 
-## 📋 Table of Contents
-
-- [Overview](#-overview)
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [Quick Start](#-quick-start)
-- [Installation Guide](#-installation-guide)
-- [Configuration](#-configuration)
-- [Usage Guide](#-usage-guide)
-- [API Documentation](#-api-documentation)
-- [Project Structure](#-project-structure)
-- [Contributing](#-contributing)
-- [License](#-license)
-
----
-
 ## 🌟 Overview
 
 The **Women Safety Platform** is a cutting-edge web and mobile application designed to ensure women's safety through advanced technology. It combines real-time GPS tracking, instant emergency alerts, automated police connectivity, and secure evidence submission in one comprehensive solution.
@@ -115,7 +99,7 @@ npm run dev
 
 **That's it!** 🎉 The application will be running on:
 - Frontend: `http://localhost:3000`
-- Backend: `http://localhost:5000`
+- Backend: `http://localhost:8080`
 
 ---
 
@@ -191,36 +175,13 @@ Create a `.env` file in the `backend` directory:
 
 ```env
 # Server Configuration
-PORT=5000
-NODE_ENV=development
+PORT=8080
 
 # Database
 MONGODB_URI=mongodb://localhost:27017/women_safety_db
 
 # JWT Secret
 JWT_SECRET=your_super_secret_jwt_key_change_this
-JWT_EXPIRE=7d
-
-# Email Configuration (for notifications)
-EMAIL_SERVICE=gmail
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-
-# SMS API (Optional)
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_token
-TWILIO_PHONE_NUMBER=+1234567890
-
-# Police API (if available)
-POLICE_API_KEY=your_police_api_key
-POLICE_API_URL=https://api.police.gov/v1
-
-# File Upload
-MAX_FILE_SIZE=10485760
-UPLOAD_PATH=./uploads
-
-# CORS
-CORS_ORIGIN=http://localhost:3000
 ```
 
 ### Frontend Environment Variables
@@ -228,16 +189,8 @@ CORS_ORIGIN=http://localhost:3000
 Create a `.env` file in the `frontend` directory:
 
 ```env
-# API Configuration
-REACT_APP_API_URL=http://localhost:5000/api
-REACT_APP_SOCKET_URL=http://localhost:5000
-
-# Google Maps API (for maps)
-REACT_APP_GOOGLE_MAPS_KEY=your_google_maps_api_key
-
-# App Configuration
-REACT_APP_NAME=Women Safety Platform
-REACT_APP_VERSION=1.0.0
+# Server Configuration
+PORT=3000
 ```
 
 ---
@@ -256,13 +209,13 @@ REACT_APP_VERSION=1.0.0
 5. Grant location permissions
 ```
 
-#### 2. Setting Up Emergency Contacts
+#### 2. Setting Up Profile
 
 ```
-1. Navigate to Settings → Emergency Contacts
-2. Click "Add Contact"
-3. Enter name, phone number, and relationship
-4. Save contacts (minimum 3 recommended)
+1. Navigate to Settings → Profile
+2. Update your personal information
+3. Grant location permissions
+4. Save your settings
 ```
 
 #### 3. Using SOS Feature
@@ -316,147 +269,59 @@ REACT_APP_VERSION=1.0.0
 ## 📁 Project Structure
 
 ```
-Women-Safety-Platform/
+women-safety-app/
 │
-├── 📁 backend/
-│   ├── 📁 controllers/
-│   │   ├── authController.js        # Authentication logic
-│   │   ├── userController.js        # User management
-│   │   ├── emergencyController.js   # SOS handling
-│   │   └── evidenceController.js    # File uploads
-│   │
-│   ├── 📁 models/
-│   │   ├── User.js                  # User schema
-│   │   ├── Emergency.js             # Emergency alert schema
-│   │   ├── Evidence.js              # Evidence schema
-│   │   └── Location.js              # Location tracking schema
-│   │
-│   ├── 📁 routes/
-│   │   ├── auth.js                  # Auth routes
-│   │   ├── user.js                  # User routes
-│   │   ├── emergency.js             # Emergency routes
-│   │   └── evidence.js              # Evidence routes
-│   │
-│   ├── 📁 middleware/
-│   │   ├── auth.js                  # JWT verification
-│   │   ├── errorHandler.js          # Error handling
-│   │   └── upload.js                # File upload handling
-│   │
-│   ├── 📁 utils/
-│   │   ├── sendEmail.js             # Email service
-│   │   ├── sendSMS.js               # SMS service
-│   │   └── encryption.js            # Data encryption
-│   │
-│   ├── app.js                       # Express app setup
-│   ├── server.js                    # Server entry point
+├── 📁 backend/                      # Node.js + Express (API + MongoDB)
+│   ├── 📁 src/
+│   │   ├── 📁 config/
+│   │   │   └── db.js                # MongoDB connection
+│   │   ├── 📁 models/
+│   │   │   ├── User.js              # User schema
+│   │   │   ├── Alert.js             # Alert schema
+│   │   │   └── PoliceStation.js     # Police station schema
+│   │   ├── 📁 routes/
+│   │   │   ├── userRoutes.js        # User API routes
+│   │   │   ├── alertRoutes.js       # Alert API routes
+│   │   │   └── policeRoutes.js      # Police API routes
+│   │   ├── 📁 controllers/
+│   │   │   ├── userController.js    # User business logic
+│   │   │   ├── alertController.js   # Alert handling logic
+│   │   │   └── policeController.js  # Police operations logic
+│   │   ├── 📁 utils/
+│   │   │   ├── sendNotification.js  # Push notification service
+│   │   │   └── getRiskLevel.js      # Risk assessment utility
+│   │   ├── 📁 upload/               # File upload directory
+│   │   └── server.js                # Main Express server
 │   └── package.json
 │
-├── 📁 frontend/
-│   ├── 📁 public/
-│   │   ├── index.html
-│   │   └── favicon.ico
-│   │
+├── 📁 frontend/                     # React App
+│   ├── 📁 public/                   # Static files
 │   ├── 📁 src/
 │   │   ├── 📁 components/
-│   │   │   ├── Header.js
-│   │   │   ├── SOSButton.js         # Emergency button
-│   │   │   ├── MapView.js           # Real-time map
-│   │   │   ├── ContactList.js       # Emergency contacts
-│   │   │   └── EvidenceUpload.js    # File upload component
-│   │   │
+│   │   │   ├── EmergencyButton.jsx  # SOS button component
+│   │   │   ├── MapTracking.jsx      # Real-time location map
+│   │   │   └── AlertHistory.jsx     # Alert history display
 │   │   ├── 📁 pages/
-│   │   │   ├── Home.js
-│   │   │   ├── Login.js
-│   │   │   ├── Register.js
-│   │   │   ├── Dashboard.js
-│   │   │   ├── Emergency.js
-│   │   │   └── Settings.js
-│   │   │
-│   │   ├── 📁 context/
-│   │   │   ├── AuthContext.js       # Authentication state
-│   │   │   └── LocationContext.js   # Location tracking state
-│   │   │
+│   │   │   ├── 📁 Home/
+│   │   │   │   └── Home.jsx         # Landing page
+│   │   │   ├── 📁 Register/
+│   │   │   │   ├── UserRegister.jsx # User registration
+│   │   │   │   └── PoliceRegister.jsx # Police registration
+│   │   │   ├── 📁 Login/
+│   │   │   │   ├── UserLogin.jsx    # User login page
+│   │   │   │   └── PoliceLogin.jsx  # Police login page
+│   │   │   └── 📁 Dashboard/
+│   │   │       ├── UserDashboard.jsx # User dashboard
+│   │   │       └── PoliceDashboard.jsx  # Police admin dashboard
 │   │   ├── 📁 services/
-│   │   │   ├── api.js               # API calls
-│   │   │   ├── socket.js            # WebSocket connection
-│   │   │   └── geolocation.js       # GPS services
-│   │   │
-│   │   ├── App.js
-│   │   ├── index.js
-│   │   └── package.json
+│   │   │   └── api.js               # Axios API calls
+│   │   ├── App.js                   # Main React component
+│   │   └── index.js                 # Entry point
+│   └── package.json
 │
-├── 📁 uploads/                      # Uploaded evidence files
-├── .gitignore
+├── .env                             # Environment variables
 ├── package.json                     # Root package file
-└── README.md
-```
-
----
-
-## 🔌 API Documentation
-
-### Authentication Endpoints
-
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "Jane Doe",
-  "email": "jane@example.com",
-  "password": "SecurePass123",
-  "phone": "+1234567890"
-}
-```
-
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "jane@example.com",
-  "password": "SecurePass123"
-}
-```
-
-### Emergency Endpoints
-
-#### Trigger SOS Alert
-```http
-POST /api/emergency/sos
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "location": {
-    "latitude": 28.6139,
-    "longitude": 77.2090
-  },
-  "message": "Emergency situation"
-}
-```
-
-#### Get Nearby Police Stations
-```http
-GET /api/emergency/nearby-police?lat=28.6139&lng=77.2090
-Authorization: Bearer {token}
-```
-
-### Evidence Endpoints
-
-#### Upload Evidence
-```http
-POST /api/evidence/upload
-Authorization: Bearer {token}
-Content-Type: multipart/form-data
-
-{
-  "file": [binary],
-  "description": "Evidence description",
-  "emergencyId": "emergency_id"
-}
+└── README.md                        # Project documentation
 ```
 
 ---
