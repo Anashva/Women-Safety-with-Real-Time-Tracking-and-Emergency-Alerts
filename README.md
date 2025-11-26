@@ -178,7 +178,7 @@ Create a `.env` file in the `backend` directory:
 PORT=8080
 
 # Database
-MONGODB_URI=mongodb://localhost:27017/women_safety_db
+MONGODB_URI=mongodb://localhost:27017/Women-Safety
 
 # JWT Secret
 JWT_SECRET=your_super_secret_jwt_key_change_this
