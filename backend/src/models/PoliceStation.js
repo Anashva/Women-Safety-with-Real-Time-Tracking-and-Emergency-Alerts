@@ -6,7 +6,7 @@ const policeStationSchema = new mongoose.Schema({
 //     lat: Number,
 //     lng: Number,
 //   },
-location: {       // ✅ GeoJSON format
+location: {       //  GeoJSON format
     type: {
       type: String,
       enum: ["Point"],
