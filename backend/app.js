@@ -3,11 +3,12 @@ const app=express();
 const http = require("http");
 const socketio = require("socket.io");
 
-const mongoose=require('mongoose');
 // const db=require('./src/config/db');
 const cors=require('cors');
 const userRoutes=require('./src/routes/userRoutes');
 const dotenv  = require('dotenv');
+dotenv.config();
+const mongoose=require('mongoose');
 const alertRoutes=require('./src/routes/alertRoutes')
 const policeRoutes=require('./src/routes/policeRoutes');
 const path = require('path');
@@ -92,7 +93,7 @@ io.on("connection", (socket) => {
 
 
 
-dotenv.config();
+// dotenv.config();
 
 
 
@@ -102,7 +103,8 @@ dotenv.config();
 
 
 // databse connection
-mongoose.connect('mongodb://127.0.0.1:27017/Women-Safety')
+const mongoURI = process.env.MONGO_URI;
+mongoose.connect(mongoURI)
 .then(()=>{
     console.log("db connected");
 
